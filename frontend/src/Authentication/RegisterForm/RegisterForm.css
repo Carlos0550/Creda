@@ -1,0 +1,19 @@
+.register-form-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+  }
+  
+  .register-form h2 {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 0.5rem;
+  }
+  

@@ -1,0 +1,44 @@
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #000;
+    
+  }
+  
+  .auth-container-items {
+    width: 100%;
+    max-width: 500px;
+    background-color: #2e2e2e;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow:
+      0 10px 25px rgba(255, 255, 255, 0.08),
+      0 4px 8px rgba(255, 255, 255, 0.04),
+      0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(4px);
+    transition: all 0.4s ease;
+    animation: fadeIn 0.6s ease forwards;
+  }
+  
+  .auth-container-items h1 {
+    color: white;
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 1.5rem;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
