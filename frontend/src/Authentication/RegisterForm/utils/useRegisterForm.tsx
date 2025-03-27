@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import {showNotification} from "@mantine/notifications"
+import { useAppContext } from "../../../Context/AppContext"
 interface formValuesInterface{
     user_name: string,
     user_password: string,
@@ -9,6 +10,12 @@ interface formValuesInterface{
 type formErrors = Partial<Record<keyof formValuesInterface, string>>
 
 function useRegisterForm() {
+    const { 
+        usersHook:{
+            createUser
+        }
+    } = useAppContext()
+
     const [formValues, setFormValues] = useState<formValuesInterface>({
         user_email: "",
         user_name: "",
@@ -42,7 +49,7 @@ function useRegisterForm() {
             errors["user_email"] = "El correo electrónico ingresado no es válido.";
         }
     
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^_-])[A-Za-z\d@$!%*#?&^_-]{8,24}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[^\s]{8,24}$/;
         if (!passwordRegex.test(formValues.user_password)) {
             errors["user_password"] = "La contraseña debe tener entre 8 y 24 caracteres, incluyendo letras, números y al menos un carácter especial.";
         }
@@ -60,14 +67,26 @@ function useRegisterForm() {
         }
     }
 
-    const onFinish = (e: React.FormEvent) => {
+    const [creatingUser, setCreatingUser] = useState<boolean>(false)
+    const onFinish = async(e: React.FormEvent) => {
         e.preventDefault()
         
         if(handleCheckErrors()){
-            showNotification({
-                message: "Enviando formulario",
-                title: "Formulario válido"
-            })
+            try {
+                setCreatingUser(true)
+                const result = await createUser(formValues)
+                setCreatingUser(false)
+
+                if(result){
+                    return setFormValues({
+                        user_email: "",
+                        user_name: "",
+                        user_password: ""
+                    })
+                }
+            } catch (error) {
+                console.log(error)
+            }
         }else{
             showNotification({
                 title:"No fue posible enviar crear su cuenta",
@@ -79,12 +98,9 @@ function useRegisterForm() {
         }
     }
 
-    useEffect(()=>{
-console.log(errors)
-    },[errors])
   return {
     handleInputChange, formValues,
-    errors, onFinish
+    errors, onFinish, creatingUser
   }
 }
 

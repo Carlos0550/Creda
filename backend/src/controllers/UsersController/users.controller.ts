@@ -43,12 +43,12 @@ export async function createUser(
     let client;
   
     const { "createUser.sql": CUQueries } = queries;
-  
     if (!CUQueries) {
       console.log("Archivo createUser.sql no encontrado");
-      return res.status(500).json({
+        res.status(500).json({
         msg: "Error interno del servidor, espere unos segundos e intente nuevamente."
       });
+      return
     }
     const {
         user_email,
@@ -58,24 +58,38 @@ export async function createUser(
     try {
         client = await pool.connect()
 
+        const clientsCount = await client.query(CUQueries[0], [user_email])
+        if(clientsCount.rows[0].count > 0){
+            res.status(400).json({
+                msg: "El correo ingresado ya esta registrado."
+            });
+            return;
+        }
+
         const hashedPassword = await genHashPassword(user_password)
-        const result = await pool.query(CUQueries[0], [
-            user_email,
+        
+        const result = await pool.query(CUQueries[1], [
             capitalizeNames(user_name),
+            user_email,
             hashedPassword
         ])
-        if(result.rowCount === 0) return res.status(400).json({
+        if(result.rowCount === 0) {
+            res.status(400).json({
             msg: "Ocurrió un problema al intentar registrarte, espera unos segundos e intenta nuevamente"
         })
+        return
+    }
 
-        return res.status(201).json({
+        res.status(201).json({
             msg: `Cuenta creada exitosamente, bienvenido a Creda ${user_name}`
         })
+        return
     } catch (error) {
         console.log(error)
-        return res.status(500).json({
+        res.status(500).json({
             msg: "Error interno en el servidor, espera unos segundos e intenta nuevamente"
         })
+        return
     }finally{
         if(client) client.release()
     }

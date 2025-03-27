@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { AppContextValuesInterface } from "./Types/AppContextTypes";
+import useUsers from "./useUsers";
 
 const AppContext = createContext<AppContextValuesInterface | undefined>(undefined)
 
@@ -23,8 +24,11 @@ export const AppContextProvider = ({children}: any) => {
         return () => window.removeEventListener("resize", resizeE)
     },[])
     
+    const usersHook = useUsers()
+
     const contextValues = useMemo(() => ({
-        width
+        width,
+        usersHook
     }),[
     
     ])

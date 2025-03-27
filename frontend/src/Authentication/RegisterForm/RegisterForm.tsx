@@ -6,7 +6,7 @@ import useRegisterForm from './utils/useRegisterForm'
 function RegisterForm() {
 
     const {
-        handleInputChange, formValues, errors, onFinish
+        handleInputChange, formValues, errors, onFinish, creatingUser
     } = useRegisterForm()
     return (
         <div className='register-form-container'>
@@ -16,7 +16,6 @@ function RegisterForm() {
                     <Input
                         placeholder='Jhon Doe'
                         type='text'
-                        error={!!formValues.user_name}
                         value={formValues.user_name}
                         name='user_name'
                         onChange={handleInputChange}
@@ -30,7 +29,6 @@ function RegisterForm() {
                     <Input
                         placeholder='jhondoe@example.com'
                         type='text'
-                        error={!!formValues.user_email}
                         onChange={handleInputChange}
                         name='user_email'
                         value={formValues.user_email}
@@ -48,7 +46,6 @@ function RegisterForm() {
                         name='user_password'
                         value={formValues.user_password}
                         type='text'
-                        error={!!formValues.user_password}
                     />
 
                     {errors?.user_password && (
@@ -57,12 +54,14 @@ function RegisterForm() {
                 </Input.Wrapper>
 
                 <Button type='submit'
+                    disabled={creatingUser}
+                    loading={creatingUser}
                     styles={{
                         label: {
                             color: 'black'
                         },
                         root: {
-                            backgroundColor: "white"
+                            backgroundColor: creatingUser ? "black" : "white"
                         }
                     }}
                 >Crear cuenta</Button>
