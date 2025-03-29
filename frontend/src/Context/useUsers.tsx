@@ -48,11 +48,58 @@ function useUsers() {
             return false;
         };
     },[]);
+
+    const loginUser = useCallback(async (userData: any) => {
+        const url = new URL(globalApis.users + "/login-user")
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers:{
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const responseData = await response.json()
+            if(!response.ok){
+                showNotification({
+                    title: "Error al iniciar sesión",
+                    message: responseData.msg || "Error desconocido.",
+                    position: "top-right",
+                    autoClose: 3500,
+                    color: "yellow"
+                })
+
+                return false
+            };
+            showNotification({
+                title: "Iniciaste sesión correctamente.",
+                message: responseData.msg || "Un momento...",
+                position: "top-right",
+                autoClose: 2500,
+                color: "blue"
+            })
+
+            return true
+            
+        } catch (error) {
+            console.log(error)
+            showNotification({
+                title: "Error al iniciar sesión",
+                message: error.message || "Error desconocido.",
+                position: "top-right",
+                autoClose: 5500,
+                color: "red"
+            })
+
+            return false
+        }
+    },[])
   
     return useMemo(()=> ({
-        createUser
+        createUser, loginUser
   }),[
-        createUser
+        createUser, loginUser
   ])
 }
 

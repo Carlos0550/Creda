@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 const usersRouter = Router()
 
 import * as users_controller from "../controllers/UsersController/users.controller"
-import { createUserFunctionInterface } from "../Types/users.types";
+import { createUserFunctionInterface, loginUserFunctionInterface } from "../Types/users.types";
 
 usersRouter.post("/create-user",(
         req: Request<{}, {}, createUserFunctionInterface>,
@@ -40,5 +40,21 @@ usersRouter.post("/create-user",(
     },
     users_controller.createUser
 );
+
+usersRouter.post("/login-user", (
+    req: Request<{},{}, loginUserFunctionInterface>,
+    res: Response,
+    next: NextFunction   
+) => {
+    const { user_email, user_password } = req.body
+
+    if(!user_email || !user_password){
+        res.status(400).json({
+            msg: "El servidor no recibió algunos parametros, verifique que todos los campos estén completos e intente nuevamente."
+        });
+        return
+    }
+    next()
+}, users_controller.loginUser)
 
 export default usersRouter

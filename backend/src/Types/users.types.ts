@@ -4,6 +4,11 @@ interface createUserFunctionInterface{
     user_email: string,
 }
 
+interface loginUserFunctionInterface{
+    user_password: string,
+    user_email: string,
+}
+
 export {
-    createUserFunctionInterface
+    createUserFunctionInterface, loginUserFunctionInterface
 }

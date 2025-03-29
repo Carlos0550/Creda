@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import pool from "../../connections/database_conn";
-import { createUserFunctionInterface } from "../../Types/users.types";
+import { createUserFunctionInterface, loginUserFunctionInterface } from "../../Types/users.types";
 import fs from "fs"
 import path from "path"
-import { genHashPassword } from "../../Security/PasswordSecurity";
+import { comparePassword, genHashPassword } from "../../Security/PasswordSecurity";
 
 let queries: Record<string, string[]> = {};
 
@@ -94,3 +94,60 @@ export async function createUser(
         if(client) client.release()
     }
   }
+
+export async function loginUser(req:Request<{},{},loginUserFunctionInterface>, res:Response) {
+    const { "loginUser.sql": LUQueries } = queries
+    if(!LUQueries){
+        res.status(500).json({
+            msg: "Error interno en el servidor, espere unos segundos e intente nuevamente."
+        })
+        console.log("Archivo 'LOGINUSER.SQL' no encontrado.")
+        return;
+    };
+
+    type ResponseUserTypes = {
+        user_id: string,
+        user_name: string,
+        user_email: string,
+        user_password: string
+    }
+
+    const { user_email, user_password } = req.body
+    let client;
+    try {
+        client = await pool.connect()
+        const result1 = await client.query(LUQueries[0],[user_email])
+        const userCount = result1.rows[0].count
+
+        if(parseInt(userCount) === 0){
+            res.status(404).json({
+                msg: "El correo ingresado no está registrado, por favor corrobore los datos ingresados."
+            });
+            return;
+        }
+
+        const result2 = await client.query(LUQueries[1], [user_email]);
+        const user = result2.rows[0] as ResponseUserTypes;
+
+        if(await comparePassword(user_password, user.user_password)){
+            res.status(200).json({
+                msg: `Bienvenido, ${capitalizeNames(user.user_name)}`,
+                userData: user
+            })
+            return
+        }else{
+            res.status(400).json({
+                msg: "Credenciales incorrectas, verifique la contraseña e intente nuevamente."
+            })
+            return
+        }
+    } catch (error) {
+        res.status(500).json({
+            msg: "Error interno en el servidor, espere unos segundos e intente nuevamente."
+        })
+        console.log("Error en loginUserFunction: ", error)
+        return;
+    }finally{
+        if(client) client.release()
+    }
+}
