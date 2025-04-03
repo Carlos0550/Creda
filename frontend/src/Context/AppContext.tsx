@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { AppContextValuesInterface } from "./Types/AppContextTypes";
 import useUsers from "./useUsers";
+import usePredict from "./usePredict";
 
 const AppContext = createContext<AppContextValuesInterface | undefined>(undefined)
 
@@ -26,11 +27,15 @@ export const AppContextProvider = ({children}: any) => {
     
     const usersHook = useUsers()
 
+    const usePredictHook = usePredict()
+
     const contextValues = useMemo(() => ({
         width,
-        usersHook
+        usersHook,
+        usePredictHook
     }),[
-    
+        usePredictHook,
+        usersHook
     ])
     return (
     <AppContext.Provider value={contextValues}>
