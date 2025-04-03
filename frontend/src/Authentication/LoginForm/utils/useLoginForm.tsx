@@ -15,7 +15,7 @@ function useLoginForm() {
         user_password: ""
     });
 
-    const { usersHook: {loginUser, getLocaleUserInfo} } = useAppContext()
+    const { usersHook: { loginUser, getLocaleUserInfo } } = useAppContext()
 
     const [errors, setErrors] = useState<formErrors>({
         user_email: "",
@@ -56,28 +56,26 @@ function useLoginForm() {
 
     const [isLogging, setIsLogging] = useState<boolean>(false)
     const navigate = useNavigate()
-    const onFinish = async(e: React.FormEvent) => {
+    const onFinish = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if(handleCheckErrors()){
+        if (handleCheckErrors()) {
             setIsLogging(true)
             const result = await loginUser(formValues)
             setIsLogging(false)
-            if(result){
+            if (result) {
                 setFormValues({
                     user_email: "",
                     user_password: ""
                 })
 
-                setTimeout(() => {
-                    const { user_id, user_name } = getLocaleUserInfo()
-                    if(!user_id) return;
-                    showNotification({title: `Bienvenido nuevamente, ${user_name}`, message: "", autoClose: 1500, position: "top-right", color: "green"})
-                    return navigate(`/home/${user_id}`)
-                }, 2000);
+                const { user_id, user_name } = getLocaleUserInfo()
+                if (!user_id) return;
+                showNotification({ title: `Bienvenido nuevamente, ${user_name}`, message: "", autoClose: 1500, position: "top-right", color: "green" })
+                return navigate(`/home/${user_id}`)
             }
         }
-    } 
+    }
     return {
         errors, handleInputChange, formValues, onFinish, isLogging
     }
