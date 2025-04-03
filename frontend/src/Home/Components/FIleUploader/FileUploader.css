@@ -1,0 +1,31 @@
+.file-uploader-container {
+  border: 2px dashed #ccc;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.file-uploader-container.dragging {
+  
+  background-color: #f0f8ff;
+  border-color: #007bff;
+}
+
+.file-information{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buttons-flex{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  
+}
