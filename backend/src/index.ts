@@ -6,6 +6,7 @@ import cors from "cors";
 import pool from "./connections/database_conn";
 import redis from "./connections/redis_conn";
 import usersRouter from "./routes/users.routes";
+import predictRouter from "./routes/predict.routes";
 
 
 dotenv.config();
@@ -47,6 +48,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/users", usersRouter)
+app.use("/predict", predictRouter)
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`🚀 Server listening on port ${process.env.PORT || 5000}`);
