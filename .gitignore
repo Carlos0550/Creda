@@ -1,3 +1,5 @@
 pm_service/env
 frontend/node_modules
 backend/node_modules
+queue_service/env
+queue_service/__pycache__
