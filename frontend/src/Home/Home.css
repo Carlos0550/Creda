@@ -1,0 +1,36 @@
+.home-container{
+    width: 100%;
+    border: 1px solid #ccc;
+    min-height: 50vh;
+    border-radius: 5px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 1rem;
+    padding: 1rem;
+
+}
+
+.operations-register-container, .new-operation-container{
+    border: 1px solid white;
+    flex: 1;
+    min-width: 400px;
+    color: white;
+    padding: 0 .5rem;
+    border-radius: .2rem;
+}
+
+@media(max-width:590px){
+    .operations-register-container, .new-operation-container{
+        min-width: 100%;
+    }
+}
+
+.operations-register-container p{
+    color: #ccc;
+}
+
+.new-operation-container{
+    padding: 1rem;
+}
