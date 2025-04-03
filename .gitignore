@@ -4,3 +4,4 @@ backend/node_modules
 queue_service/env
 queue_service/__pycache__
 backend/src/uploads
+queue_service/.env
