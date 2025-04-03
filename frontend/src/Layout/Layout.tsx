@@ -34,7 +34,7 @@ function Layout({ content }: LayoutInterface) {
                     </div>
                 </nav>
             </header>
-            <main>
+            <main className='main-content'>
                 {content}
             </main>
         </div>

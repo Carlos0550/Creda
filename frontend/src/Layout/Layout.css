@@ -44,3 +44,8 @@
     color: black;
     cursor: pointer;
 }
+
+.main-content{
+    flex: 1;
+    margin: .5rem;
+}
