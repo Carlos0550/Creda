@@ -44,12 +44,35 @@ const verifyRequest = (
   next();
 };
 
-predictRouter.post("/analyze-file", upload.single("file"), verifyRequest, (req: Request, res: Response, next: NextFunction) => {
+const handleRollbackFile = (fileName: string) => {
+  const uploadFolder = path.join(__dirname, "../uploads")
+  const filePath = path.join(uploadFolder, fileName)
   
-  res.status(200).json({
-    msg: "Archivo recibido y datos del usuario verificados.",
-    archivo: req.file?.filename,
-  });
+  setTimeout(() => {
+    if(fs.existsSync(filePath)){
+      try {
+        fs.unlinkSync(filePath)
+        console.log("Archivo eliminado:", fileName);
+      } catch (error) {
+        console.error("No se pudo eliminar el archivo:", error);
+      }
+    }
+  }, 500);
+}
+
+predictRouter.post("/analyze-file", upload.single("file"), verifyRequest, (req: Request, res: Response, next: NextFunction) => {
+  const fileName = req.file?.filename;
+  const { user_data } = req.body;
+  const parsedData = user_data ? JSON.parse(user_data) : ""
+  if (!fileName || !parsedData) {
+    res.status(400).json({
+      msg: "Faltan datos: se requiere un archivo válido y el userId."
+    });
+
+    if(fileName) handleRollbackFile(fileName)
+    return
+  }
+
   next()
 }, saveFile);
 
@@ -62,10 +85,11 @@ predictRouter.get("/file-status", async (req: Request, res: Response, next: Next
     return
   }
 
-  if(!user_id){
+  if (!user_id) {
     res.status(400).json({
       msg: "No se encontro el ID del usuario en la solicitud."
     })
+    return
   }
   const validStatuses = ["pending", "locked", "analyzed"] as const;
   type FileStatus = typeof validStatuses[number]
@@ -86,9 +110,9 @@ predictRouter.get("/file-status", async (req: Request, res: Response, next: Next
 
 predictRouter.post("/get-pending", getAndLockPendingFile)
 
-predictRouter.post("/mark-as-analyzed", async(req:Request<{}, {}, MarkAsAnalyzedEndpointInterface>, res:Response, next:NextFunction) => {
+predictRouter.post("/mark-as-analyzed", async (req: Request<{}, {}, MarkAsAnalyzedEndpointInterface>, res: Response, next: NextFunction) => {
   const { fileName, columns } = req.body
-  if(!fileName){
+  if (!fileName) {
     res.status(400).json({
       msg: "El nombre del archivo es requerido."
     })
@@ -101,7 +125,7 @@ predictRouter.post("/mark-as-analyzed", async(req:Request<{}, {}, MarkAsAnalyzed
     });
     return;
   }
-  
+
 
   next()
 }, markFilesAsAnalyzed)
