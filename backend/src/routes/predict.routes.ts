@@ -4,7 +4,6 @@ import fs from "fs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { getAndLockPendingFile, markFilesAsAnalyzed, saveFile, verifyFileState } from "../controllers/PredictionsController/predict.controller";
-import { createUserFunctionInterface } from "../Types/users.types";
 import { MarkAsAnalyzedEndpointInterface } from "../Types/predict.types";
 
 const predictRouter = Router();
@@ -27,22 +26,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-const verifyRequest = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { user_data } = req.body;
-  const user_info: Partial<createUserFunctionInterface> = JSON.parse(user_data)
-  if (!user_info?.user_name) {
-    res.status(400).json({
-      msg: "El servidor no recibió los datos del usuario. No fue posible hacer una predicción.",
-    });
-    return
-  }
-
-  next();
-};
 
 const handleRollbackFile = (fileName: string) => {
   const uploadFolder = path.join(__dirname, "../uploads")
@@ -60,11 +43,11 @@ const handleRollbackFile = (fileName: string) => {
   }, 500);
 }
 
-predictRouter.post("/analyze-file", upload.single("file"), verifyRequest, (req: Request, res: Response, next: NextFunction) => {
+predictRouter.post("/analyze-file", upload.single("file"), (req: Request, res: Response, next: NextFunction) => {
   const fileName = req.file?.filename;
-  const { user_data } = req.body;
-  const parsedData = user_data ? JSON.parse(user_data) : ""
-  if (!fileName || !parsedData) {
+  const { user_id } = req.body;
+  
+  if (!fileName || !user_id) {
     res.status(400).json({
       msg: "Faltan datos: se requiere un archivo válido y el userId."
     });
@@ -77,20 +60,14 @@ predictRouter.post("/analyze-file", upload.single("file"), verifyRequest, (req: 
 }, saveFile);
 
 predictRouter.get("/file-status", async (req: Request, res: Response, next: NextFunction) => {
-  const { status, user_id } = req.query
+  const { status } = req.query
   if (!status) {
     res.status(400).json({
       msg: "El parametro 'status' no se encontró en la solicitud."
     })
     return
   }
-
-  if (!user_id) {
-    res.status(400).json({
-      msg: "No se encontro el ID del usuario en la solicitud."
-    })
-    return
-  }
+  
   const validStatuses = ["pending", "locked", "analyzed"] as const;
   type FileStatus = typeof validStatuses[number]
   if (!status || typeof status !== "string") {
@@ -104,11 +81,10 @@ predictRouter.get("/file-status", async (req: Request, res: Response, next: Next
     });
     return
   }
-
   next()
 }, verifyFileState)
 
-predictRouter.post("/get-pending", getAndLockPendingFile)
+predictRouter.post("/lock-pending", getAndLockPendingFile)
 
 predictRouter.post("/mark-as-analyzed", async (req: Request<{}, {}, MarkAsAnalyzedEndpointInterface>, res: Response, next: NextFunction) => {
   const { fileName, columns } = req.body
