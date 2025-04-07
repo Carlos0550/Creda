@@ -2,6 +2,7 @@
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import cors from "cors";
+import path from "path"
 
 import pool from "./connections/database_conn";
 import redis from "./connections/redis_conn";
@@ -49,6 +50,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/users", usersRouter)
 app.use("/predict", predictRouter)
+app.use("/download-files", express.static(path.join(__dirname, "uploads")))
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`🚀 Server listening on port ${process.env.PORT || 5000}`);
