@@ -10,7 +10,7 @@ function usePredict() {
 
         formData.append("file", file)
         const user_data = localStorage.getItem("user_data")
-        formData.append("user_data", user_data)
+        formData.append("user_data", user_data || "")
        
         try {
             setUploading(true)

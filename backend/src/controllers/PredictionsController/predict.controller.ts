@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import path from "path";
 import fs from "fs";
 import Redis from "ioredis";
+import { randomUUID } from "crypto";
 
 const redis = new Redis({
     host: "localhost",
@@ -15,22 +16,15 @@ redis.on('error', (err: Error) => {
 
 export async function saveFile(req: Request, res: Response) {
     const fileName = req.file?.filename;
-    const { userId } = req.body;
-
-    if (!fileName || !userId) {
-        res.status(400).json({
-            msg: "Faltan datos: se requiere un archivo válido y el userId."
-        });
-        return
-    }
-
+    const { user_data } = req.body;
+    const { user_id } = user_data
     try {
         console.log("Agregando nuevo archivo a Redis pendiente de análisis...");
-        await redis.sadd("files:pending", fileName);
+        await redis.sadd("files:pending", fileName || randomUUID());
 
         const metadataKey = `filedata:${fileName}`;
         await redis.hset(metadataKey, {
-            userId,
+            user_id,
             status: "pending"
         });
 
