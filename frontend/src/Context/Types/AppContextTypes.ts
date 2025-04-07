@@ -10,6 +10,7 @@ interface usersHookInterface{
 interface usePredictHookInterface{
     uploading: boolean;
     sendFile: (file: File) => Promise<boolean>;
+    pendingColumns: boolean
 }
 
 export interface AppContextValuesInterface{
