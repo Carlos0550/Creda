@@ -5,12 +5,13 @@ import { FaTrash } from "react-icons/fa";
 import { Button } from '@mantine/core';
 import { FaBrain } from "react-icons/fa";
 import { useAppContext } from '../../../Context/AppContext';
+import FileUploaderLoader from './FileUploaderLoader';
 function FileUploader() {
   const [file, setFile] = useState<File | undefined>(undefined);
   const [isDragging, setIsDragging] = useState(false);
-  const {  
-    usePredictHook:{
-      sendFile, uploading
+  const {
+    usePredictHook: {
+      sendFile, uploading, pendingColumns
     }
   } = useAppContext()
 
@@ -59,7 +60,7 @@ function FileUploader() {
   }
 
   const handleSendFile = () => sendFile(file)
-
+  const text = "Su archivo está en proceso de ser analizado, espere unos segundos...";
   return (
     <div
       className={`file-uploader-container ${isDragging ? 'dragging' : ''}`}
@@ -67,7 +68,7 @@ function FileUploader() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      {!file && (
+      {!pendingColumns && !file && (
         <label htmlFor="image-FILE">
           <input
             ref={fileInputRef}
@@ -81,7 +82,7 @@ function FileUploader() {
         </label>
       )}
 
-      {file && (
+      {!pendingColumns && file && (
         <div className='file-information'>
           <ul>
             <strong>{file.name}</strong>
@@ -90,8 +91,27 @@ function FileUploader() {
           </ul>
           <div className="buttons-flex">
             <Button onClick={() => handleClearFile()} c={"white"} color="red" variant="outline"><FaTrash /> Eliminar</Button>
-            <Button color={"dark"} c="white" onClick={handleSendFile}><FaBrain /> Iniciar analisis</Button>
+            <Button
+              disabled={uploading}
+              loading={uploading}
+              color={"dark"} c="white" onClick={handleSendFile}><FaBrain /> Iniciar analisis</Button>
           </div>
+        </div>
+      )}
+
+      {pendingColumns && (
+        <div className='pending-columns-loader-container'>
+          <span className="pending-c-loader">
+            <FileUploaderLoader/>
+          </span>
+
+          <div className="wave-text">
+            {text.split("").map((char, i) => (
+              <span key={i} style={{ animationDelay: `${i * 0.02}s` }}>
+                {char}
+              </span>
+            ))}
+          </div>        
         </div>
       )}
     </div>
