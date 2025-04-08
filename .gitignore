@@ -5,4 +5,4 @@ queue_service/env
 queue_service/__pycache__
 backend/src/uploads
 queue_service/.env
-.pyc
+__pycache__
