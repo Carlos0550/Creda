@@ -76,7 +76,6 @@ function usePredict() {
         const url = new URL(globalApis.predict + "/file-status")
         url.searchParams.append("status", "analyzed")
         url.searchParams.append("userId", userId ? userId.toString() : "")
-        setGettingPendingFiles(true)
         try {
             const response = await fetch(url)   
             const responseData = await response.json()
@@ -91,7 +90,9 @@ function usePredict() {
                 color: "green",
                 position: "top-right"
             });
-            setCurrentFileData(responseData.archivos[0])
+            setTimeout(() => {
+                setCurrentFileData(responseData.archivos[0])
+            }, 1000);
 
             return true
         } catch (error) {
@@ -105,8 +106,6 @@ function usePredict() {
             });
 
             return false
-        }finally{
-            setGettingPendingFiles(true)
         }
     },[userId])
 
@@ -129,7 +128,9 @@ function usePredict() {
 
             if(response.status === 404) return false;
             if(!response.ok) throw new Error(responseData.msg || "Error desconocido")
-            setCurrentFileData(responseData.archivos[0])
+            setTimeout(() => {
+                setCurrentFileData(responseData.archivos[0])
+            }, 1000);
             return true
         } catch (error) {
             console.log(error)
@@ -143,8 +144,10 @@ function usePredict() {
 
             return false
         }finally{
-        
-            setGettingPendingFiles(false)
+            setTimeout(() => {
+                setGettingPendingFiles(false)
+
+            }, 1000);
         }
     },[userId])
 
@@ -157,6 +160,7 @@ function usePredict() {
 
         return () => clearInterval(timer)
     },[pendingColumns, verifyFileState])
+
 
     return useMemo(() => ({
         uploading, sendFile, pendingColumns, verifyPendingFilesForUser,
