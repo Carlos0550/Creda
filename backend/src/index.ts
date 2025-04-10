@@ -1,5 +1,4 @@
 // src/index.ts
-import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import path from "path"
@@ -10,7 +9,6 @@ import usersRouter from "./routes/users.routes";
 import predictRouter from "./routes/predict.routes";
 
 
-dotenv.config();
 
 const app = express();
 
@@ -52,6 +50,6 @@ app.use("/users", usersRouter)
 app.use("/predict", predictRouter)
 app.use("/download-files", express.static(path.join(__dirname, "uploads")))
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log(`🚀 Server listening on port ${process.env.PORT || 5000}`);
+app.listen(5000, () => {
+  console.log(`🚀 Server listening on port ${5000}`);
 });
