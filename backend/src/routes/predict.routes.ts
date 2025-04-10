@@ -87,7 +87,7 @@ predictRouter.get("/file-status", async (req: Request, res: Response, next: Next
 predictRouter.post("/lock-pending", getAndLockPendingFile)
 
 predictRouter.post("/mark-as-analyzed", async (req: Request<{}, {}, MarkAsAnalyzedEndpointInterface>, res: Response, next: NextFunction) => {
-  const { fileName, columns } = req.body
+  const { fileName, records } = req.body
   if (!fileName) {
     res.status(400).json({
       msg: "El nombre del archivo es requerido."
@@ -95,7 +95,7 @@ predictRouter.post("/mark-as-analyzed", async (req: Request<{}, {}, MarkAsAnalyz
     return
   }
 
-  if (!columns || !Array.isArray(columns) || columns.length === 0) {
+  if (!records) {
     res.status(400).json({
       msg: "El argumento 'columns' es inválido o está vacío"
     });
