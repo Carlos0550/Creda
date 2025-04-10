@@ -5,40 +5,55 @@ import { useAppContext } from '../Context/AppContext'
 
 import { Flex, Skeleton } from '@mantine/core'
 import FileListComponent from './Components/FIleList/FileListComponent'
+import ColumnsSelector from './Components/ColumnsSelector/ColumnsSelector'
 function Home() {
-  const {   
+  const {
     usePredictHook: {
-      gettingPendingFiles, verifyPendingFilesForUser, userId
+      gettingPendingFiles, verifyPendingFilesForUser, userId, currentFileData
     }
   } = useAppContext()
 
   const alreadyFetched = useRef(false)
-  useEffect(()=>{
-    if(!userId || alreadyFetched.current) return;
+  useEffect(() => {
+    if (!userId || alreadyFetched.current) return;
     verifyPendingFilesForUser()
     alreadyFetched.current = true
-  },[userId])
+  }, [userId])
   return (
     <React.Fragment>
-        <div className='home-container'>
-          <div className='operations-register-container'>
-              {!gettingPendingFiles && (
-                <FileListComponent/>
-              )}
-              {gettingPendingFiles && (
-                <Flex direction={"column"} gap={20} mt={10} mb={10} justify={"center"} align={"flex-start"}>
-                  <Skeleton height={15} width={200} animate/>
-                  <Skeleton height={15} width={400} animate/>
-                  <Skeleton height={15} width={400} animate/>
-                  <Skeleton height={15} width={400} animate/>
-              </Flex>
-              )}
-          </div>
+      <div className='home-container'>
 
-          <div className='new-operation-container'>
-              <FileUploader/>
-          </div>
-        </div>
+
+        {currentFileData && Object.keys(currentFileData).length > 0 ? (
+          <ColumnsSelector />
+        ) : (
+          <>
+            <div className='operations-register-container'>
+              {gettingPendingFiles ? (
+                <Flex direction={"column"} gap={20} mt={10} mb={10} justify={"center"} align={"flex-start"} style={{flex: "1"}}>
+                  <Skeleton height={15} width={300} animate />
+                  <Skeleton height={15} width={400} animate />
+                  <Skeleton height={15} width={400} animate />
+                  <Skeleton height={15} width={400} animate />
+                  <Skeleton height={15} width={400} animate />
+                  <Skeleton height={15} width={400} animate />
+                  <Skeleton height={15} width={400} animate />
+                </Flex>
+              ) : (
+                <>
+                <FileListComponent />
+                
+                </>
+              )}
+              
+            </div>
+            <div className='new-operation-container'>
+              <FileUploader />
+            </div>
+            
+          </>
+        )}
+      </div>
     </React.Fragment>
   )
 }
