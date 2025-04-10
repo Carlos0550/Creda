@@ -19,6 +19,21 @@ export async function saveFile(req: Request, res: Response) {
     const { user_id } = req.body;
     try {
         console.log("Agregando nuevo archivo a Redis pendiente de análisis...");
+
+        try {
+            console.log("Comprobando existencia de archivos pendientes de analisis...")
+            const filesCount = await redis.smembers(`user_files:${user_id}`)
+            if(filesCount.length > 0){
+                res.status(400).json({
+                    msg: "Ya hay un archivo pendiente de analisis, espere unos segundos o recargue esta sección"
+                })
+
+                return
+            }
+        } catch (error) {
+            console.log(error)
+        }
+
         await redis.sadd("files:pending", fileName || randomUUID());
 
         const metadataKey = `filedata:${fileName}`;
@@ -45,6 +60,7 @@ export async function saveFile(req: Request, res: Response) {
 
 export async function verifyFileState(req: Request, res: Response) {
     const { status, userId } = req.query;
+
     if (!status || typeof status !== "string") {
         res.status(400).json({
             msg: "Falta el parámetro obligatorio 'status'."
@@ -72,13 +88,17 @@ export async function verifyFileState(req: Request, res: Response) {
         }
 
         const userKeys = await redis.smembers(`user_files:${userId}`);
-        const userFiles: { file: string, columns?: string[] }[] = [];
-    
+        const userFiles: { file: string, data?: string[] }[] = [];
+        
         for (const key of userKeys) {
             const data = await redis.hgetall(key);
+            
             if (data.status === status) {
                 const fileName = key.replace("filedata:", "");
-                userFiles.push({ file: fileName, columns: data.columns ? JSON.parse(data.columns) : undefined });
+                userFiles.push({
+                    file: fileName,
+                    data: data.data ? JSON.parse(data.data) : undefined  
+                });
             }
         }
     
@@ -125,8 +145,8 @@ export async function getAndLockPendingFile(req: Request, res: Response) {
 
 //Recibe las columnas, marca archivos bloqueados a ya analizados con sus columnas
 export async function markFilesAsAnalyzed(req: Request, res: Response) {
-    const { fileName, columns } = req.body;
-    if (!fileName || !Array.isArray(columns)) {
+    const { fileName, records } = req.body;
+    if (!fileName || !records) {
          res.status(400).json({
             msg: "Faltan datos: se requiere 'fileName' y un array 'columns'."
         });
@@ -140,7 +160,7 @@ export async function markFilesAsAnalyzed(req: Request, res: Response) {
         const metadataKey = `filedata:${fileName}`;
         await redis.hset(metadataKey, {
             status: "analyzed",
-            columns: JSON.stringify(columns)
+            data: JSON.stringify(records)
         });
 
         res.sendStatus(204);
