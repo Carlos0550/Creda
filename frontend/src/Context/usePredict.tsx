@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { globalApis } from './APIs'
 
 import { showNotification } from "@mantine/notifications"
+import { FileAnalyzedInterface } from './Types/PredictTypes'
 function usePredict() {
     const [uploading, setUploading] = useState(false)
     const [userId, setUserId] = useState<string | null>("")
@@ -68,11 +69,14 @@ function usePredict() {
         }
     },[userId])
 
-    const [currentFileColumns, setCurrentFileColumns] = useState([])
+    const [currentFileData, setCurrentFileData] = useState<FileAnalyzedInterface>()
+    const [gettingPendingFiles, setGettingPendingFiles] = useState<boolean>(false)
+
     const verifyFileState = useCallback(async()=> {
         const url = new URL(globalApis.predict + "/file-status")
         url.searchParams.append("status", "analyzed")
         url.searchParams.append("userId", userId ? userId.toString() : "")
+        setGettingPendingFiles(true)
         try {
             const response = await fetch(url)   
             const responseData = await response.json()
@@ -87,8 +91,7 @@ function usePredict() {
                 color: "green",
                 position: "top-right"
             });
-            console.log(responseData)
-            setCurrentFileColumns(responseData.columns)
+            setCurrentFileData(responseData.archivos[0])
 
             return true
         } catch (error) {
@@ -102,6 +105,46 @@ function usePredict() {
             });
 
             return false
+        }finally{
+            setGettingPendingFiles(true)
+        }
+    },[userId])
+
+
+    const verifyPendingFilesForUser = useCallback(async () => {
+
+        const url = new URL(globalApis.predict + "/file-status")
+        if(!userId){
+            console.warn("USER ID no detectado.")
+            return false
+        }
+        setGettingPendingFiles(true)
+
+        url.searchParams.append("userId", userId ? userId?.toString() : "")
+        url.searchParams.append("status", "analyzed")
+
+        try {
+            const response = await fetch(url)
+            const responseData = await response.json()
+
+            if(response.status === 404) return false;
+            if(!response.ok) throw new Error(responseData.msg || "Error desconocido")
+            setCurrentFileData(responseData.archivos[0])
+            return true
+        } catch (error) {
+            console.log(error)
+            showNotification({
+                title: "Error al obtener sus pendientes.",
+                message: error.message || "Error desconocido.",
+                autoClose: 4500,
+                color: "red",
+                position: "top-right"
+            })
+
+            return false
+        }finally{
+        
+            setGettingPendingFiles(false)
         }
     },[userId])
 
@@ -116,9 +159,11 @@ function usePredict() {
     },[pendingColumns, verifyFileState])
 
     return useMemo(() => ({
-        uploading, sendFile, pendingColumns
+        uploading, sendFile, pendingColumns, verifyPendingFilesForUser,
+        gettingPendingFiles, userId, currentFileData
     }), [
-        uploading, sendFile, pendingColumns
+        uploading, sendFile, pendingColumns, verifyPendingFilesForUser,
+        gettingPendingFiles, userId, currentFileData
     ])
 }
 
