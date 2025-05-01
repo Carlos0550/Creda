@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import "./ColumnsSelector.css"
 import { useAppContext } from '../../../Context/AppContext'
+import { Radio } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import ColumnsSelectorModal from './Modals/ColumnsSelectorModal';
+
+type AnalysisStep = "columnsSelect" | ""
 function ColumnsSelector() {
     const {
         usePredictHook: {
@@ -8,11 +13,14 @@ function ColumnsSelector() {
 
         }
     } = useAppContext()
+    const [checked, setChecked] = useState<boolean>(false);
+    const [openedHasNotIdColumn, { open: openHasNotIdColumn, close: closeHasNotIdColumn }] = useDisclosure(false);
 
     const [columns, setColumns] = useState([])
     const [rows, setRows] = useState([]);
     const [hoveredColIndex, setHoveredColIndex] = useState(null);
 
+    // const [steps, setSteps] = useState
 
     useEffect(() => {
         if (currentFileData) {
@@ -27,8 +35,27 @@ function ColumnsSelector() {
             }
         }
     }, [currentFileData])
+
+    const alreadyAllowed = useRef(false)
+    useEffect(()=>{
+        if(!checked || alreadyAllowed.current) return;
+        alreadyAllowed.current = true
+        openHasNotIdColumn()
+    },[checked])
+
+
     return (
         <div className='column-selector-table-container'>
+            <div className="column-selector-steps">
+                <div className="column-selector-step_1">
+                    <p className='column-selector-p'>Por favor, seleccione la columna que sirva como identificador del cliente, puede ser un ID, un nombre, un email, etc</p>
+                    <Radio
+                        label="No tengo una columna de identificador de cliente"
+                        checked={checked}
+                        onClick={() => setChecked(!checked)}
+                    />
+                </div>
+            </div>
             <table className='column-selector-table'>
                 <thead>
                     <tr>
@@ -61,6 +88,11 @@ function ColumnsSelector() {
                     ))}
                 </tbody>
             </table>
+
+            <ColumnsSelectorModal
+                openedHasNotIdColumn={openedHasNotIdColumn}
+                closeHasNotIdColumn={closeHasNotIdColumn}
+            />
         </div>
     )
 }

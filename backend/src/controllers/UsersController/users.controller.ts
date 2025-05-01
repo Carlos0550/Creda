@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import pool from "../../connections/database_conn";
-import { createUserFunctionInterface, loginUserFunctionInterface } from "../../Types/users.types";
+import { createUserFunctionInterface, loginUserFunctionInterface, ResponseUserTypes } from "../../Types/users.types";
 import fs from "fs"
 import path from "path"
 import { comparePassword, genHashPassword } from "../../Security/PasswordSecurity";
+
 
 let queries: Record<string, string[]> = {};
 
@@ -36,66 +37,72 @@ const capitalizeNames = (name: string) => {
     ).join(" ")
 }
 
-export async function createUser(
-    req: Request<{}, {}, createUserFunctionInterface>,
-    res: Response
-  ) {
+export const createUser: RequestHandler<{}, {}, createUserFunctionInterface> = async (
+    req,
+    res
+  ) => {
     let client;
   
     const { "createUser.sql": CUQueries } = queries;
     if (!CUQueries) {
       console.log("Archivo createUser.sql no encontrado");
-        res.status(500).json({
+      res.status(500).json({
         msg: "Error interno del servidor, espere unos segundos e intente nuevamente."
       });
-      return
+      return;
     }
+  
     const {
-        user_email,
-        user_name,
-        user_password
-    } = req.body
+      user_email,
+      user_name,
+      user_password
+    } = req.body;
+  
     try {
-        client = await pool.connect()
-
-        const clientsCount = await client.query(CUQueries[0], [user_email])
-        if(clientsCount.rows[0].count > 0){
-            res.status(400).json({
-                msg: "El correo ingresado ya esta registrado."
-            });
-            return;
-        }
-
-        const hashedPassword = await genHashPassword(user_password)
-        
-        const result = await pool.query(CUQueries[1], [
-            capitalizeNames(user_name),
-            user_email,
-            hashedPassword
-        ])
-        if(result.rowCount === 0) {
-            res.status(400).json({
-            msg: "Ocurrió un problema al intentar registrarte, espera unos segundos e intenta nuevamente"
-        })
-        return
-    }
-
-        res.status(201).json({
-            msg: `Cuenta creada exitosamente, bienvenido a Creda ${user_name}`
-        })
-        return
+      client = await pool.connect();
+  
+      const clientsCount = await client.query(CUQueries[0], [user_email]);
+      if (clientsCount.rows[0].count > 0) {
+        res.status(400).json({
+          msg: "El correo ingresado ya está registrado."
+        });
+        return;
+      }
+  
+      const hashedPassword = await genHashPassword(user_password);
+  
+      const result = await pool.query(CUQueries[1], [
+        capitalizeNames(user_name),
+        user_email,
+        hashedPassword
+      ]);
+  
+      if (result.rowCount === 0) {
+        res.status(400).json({
+          msg: "Ocurrió un problema al intentar registrarte, espera unos segundos e intenta nuevamente"
+        });
+        return;
+      }
+  
+      res.status(201).json({
+        msg: `Cuenta creada exitosamente, bienvenido a Creda ${user_name}`
+      });
+      return;
+  
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            msg: "Error interno en el servidor, espera unos segundos e intenta nuevamente"
-        })
-        return
-    }finally{
-        if(client) client.release()
+      console.log(error);
+      res.status(500).json({
+        msg: "Error interno en el servidor, espera unos segundos e intenta nuevamente"
+      });
+      return;
+    } finally {
+      if (client) client.release();
     }
-  }
+  };
+  
 
-export async function loginUser(req:Request<{},{},loginUserFunctionInterface>, res:Response) {
+export const loginUser: RequestHandler<{}, {}, loginUserFunctionInterface> = async(
+    req:Request, res:Response) => {
     const { "loginUser.sql": LUQueries } = queries
     if(!LUQueries){
         res.status(500).json({
@@ -104,13 +111,6 @@ export async function loginUser(req:Request<{},{},loginUserFunctionInterface>, r
         console.log("Archivo 'LOGINUSER.SQL' no encontrado.")
         return;
     };
-
-    type ResponseUserTypes = {
-        user_id: string,
-        user_name: string,
-        user_email: string,
-        user_password: string
-    }
 
     const { user_email, user_password } = req.body
     let client;
@@ -128,7 +128,7 @@ export async function loginUser(req:Request<{},{},loginUserFunctionInterface>, r
 
         const result2 = await client.query(LUQueries[1], [user_email]);
         const user = result2.rows[0] as ResponseUserTypes;
-
+        
         if(await comparePassword(user_password, user.user_password)){
             res.status(200).json({
                 msg: `Bienvenido, ${capitalizeNames(user.user_name)}`,

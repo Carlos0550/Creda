@@ -1,19 +1,8 @@
 import { Request, Response } from "express";
-import path from "path";
-import fs from "fs";
-import Redis from "ioredis";
+import redis from "../../connections/redis_conn";
 import { randomUUID } from "crypto";
 
-const redis = new Redis({
-    host: "localhost",
-    port: 6379
-});
-
-redis.on('error', (err: Error) => {
-    console.error('❌ Redis error:', err);
-    process.exit(1);
-});
-
+//guarda un archivo en redis (lo agrega a la cola con estado pendiente de analisis)
 export async function saveFile(req: Request, res: Response) {
     const fileName = req.file?.filename;
     const { user_id } = req.body;
@@ -22,7 +11,7 @@ export async function saveFile(req: Request, res: Response) {
 
         try {
             console.log("Comprobando existencia de archivos pendientes de analisis...")
-            const filesCount = await redis.smembers(`user_files:${user_id}`)
+            const filesCount = await redis.smembers(`user_files:${user_id}`) // esto es para verificar que el mismo usuario no suba otro archivo hasta completar la prediccion
             if(filesCount.length > 0){
                 res.status(400).json({
                     msg: "Ya hay un archivo pendiente de analisis, espere unos segundos o recargue esta sección"
@@ -56,8 +45,9 @@ export async function saveFile(req: Request, res: Response) {
         });
         return
     }
-}
+}   
 
+//devuelve el estado de un/los archivo/s en la cola, 
 export async function verifyFileState(req: Request, res: Response) {
     const { status, userId } = req.query;
 
@@ -82,7 +72,7 @@ export async function verifyFileState(req: Request, res: Response) {
         if (!userId) {
             res.status(200).json({
                 status,
-                archivos: files.map(file => ({ file }))
+                archivos: files.map((file: any) => ({ file }))
             });
             return
         }
@@ -143,7 +133,8 @@ export async function getAndLockPendingFile(req: Request, res: Response) {
     }
 }
 
-//Recibe las columnas, marca archivos bloqueados a ya analizados con sus columnas
+//Recibe las columnas del servicio de colas, y
+// marca archivos bloqueados como ya analizados junto con sus columnas
 export async function markFilesAsAnalyzed(req: Request, res: Response) {
     const { fileName, records } = req.body;
     if (!fileName || !records) {

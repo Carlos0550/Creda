@@ -37,9 +37,7 @@ usersRouter.post("/create-user",(
         }
 
         next();
-    },
-    users_controller.createUser
-);
+    }, users_controller.createUser);
 
 usersRouter.post("/login-user", (
     req: Request<{},{}, loginUserFunctionInterface>,

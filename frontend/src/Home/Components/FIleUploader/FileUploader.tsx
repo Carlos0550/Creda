@@ -15,7 +15,7 @@ function FileUploader() {
     }
   } = useAppContext()
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
@@ -24,7 +24,7 @@ function FileUploader() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const droppedFile = e.dataTransfer.files[0];
@@ -33,8 +33,8 @@ function FileUploader() {
     }
   };
 
-  const handleChange = (e) => {
-    const selectedFile = e.target.files[0];
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files && e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
     }
@@ -59,7 +59,7 @@ function FileUploader() {
     return `${value.toFixed(2)} ${sizes[1]}`
   }
 
-  const handleSendFile = () => sendFile(file)
+  const handleSendFile = () => sendFile(file!)
   const text = "Su archivo está en proceso de ser analizado, espere unos segundos...";
   return (
     <div
