@@ -13,17 +13,25 @@ import {
 
 import { BrowserRouter } from "react-router-dom"
 
-import '@mantine/notifications/styles.css';
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+
 import { AppContextProvider } from './Context/AppContext.js'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <MantineProvider>
+    
+    <MantineProvider
+      theme={{
+        fontFamily: 'Poppins, sans-serif', 
+      }}
+      withGlobalStyles 
+      withNormalizeCSS
+    >
       <BrowserRouter>
         <AppContextProvider>
           <Notifications />
-          <App></App>
+          <App />
         </AppContextProvider>
       </BrowserRouter>
     </MantineProvider>

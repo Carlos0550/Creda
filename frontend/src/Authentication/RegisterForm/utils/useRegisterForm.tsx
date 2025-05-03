@@ -41,17 +41,17 @@ function useRegisterForm() {
         let errors: formErrors = {};
 
         if (formValues.user_name.trim().length < 3) {
-            errors["user_name"] = "El nombre debe tener al menos 3 caracteres.";
+            errors["user_name"] = "The name must have at least 3 characters.";
         }
     
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formValues.user_email)) {
-            errors["user_email"] = "El correo electrónico ingresado no es válido.";
+            errors["user_email"] = "The email address entered is not valid.";
         }
     
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[^\s]{8,24}$/;
         if (!passwordRegex.test(formValues.user_password)) {
-            errors["user_password"] = "La contraseña debe tener entre 8 y 24 caracteres, incluyendo letras, números y al menos un carácter especial.";
+            errors["user_password"] = "The password must be between 8 and 24 characters, including letters, numbers, and at least one special character.";
         }
     
         if(Object.keys(errors).length > 0){
