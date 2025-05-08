@@ -8,3 +8,4 @@ queue_service/.env
 __pycache__
 backend/.env
 backend/CredaDatabase.sql
+backend/dist/*
