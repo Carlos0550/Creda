@@ -5,7 +5,7 @@ import cors from "cors";
 import pool from "./connections/database_conn";
 import redis from "./connections/redis_conn";
 import managerRouter from "./routes/manager.routes";
-
+import clientRouter from "./routes/clients.routes"
 const app = express();
 
 app.use(cors());
@@ -43,6 +43,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/managers", managerRouter)
+app.use("/api/clients", clientRouter)
 
 app.listen(5000, () => {
   console.log(`🚀 Server listening on port ${5000}`);
