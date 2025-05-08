@@ -9,7 +9,7 @@ import { Pool } from "pg";
 // });
 
 const pool = new Pool({
-  connectionString: process.env.RAILWAY_PG_CONNECTION_STRING,
+  connectionString: process.env.DATABASE_PUBLIC_URL,
   ssl: {
     rejectUnauthorized: false
   }
