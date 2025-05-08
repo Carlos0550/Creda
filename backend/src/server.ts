@@ -1,14 +1,10 @@
 // src/index.ts
 import express, { Request, Response } from "express";
 import cors from "cors";
-import path from "path"
 
 import pool from "./connections/database_conn";
 import redis from "./connections/redis_conn";
-import usersRouter from "./routes/users.routes";
-import predictRouter from "./routes/predict.routes";
-
-
+import managerRouter from "./routes/manager.routes";
 
 const app = express();
 
@@ -46,9 +42,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("SERVER ON");
 });
 
-app.use("/users", usersRouter)
-app.use("/predict", predictRouter)
-app.use("/download-files", express.static(path.join(__dirname, "uploads")))
+app.use("/api/managers", managerRouter)
 
 app.listen(5000, () => {
   console.log(`🚀 Server listening on port ${5000}`);

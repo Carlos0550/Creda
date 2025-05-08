@@ -1,14 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es2020",                  // Código JS moderno, pero compatible
-    "module": "commonjs",                // Para usar require/module.exports
-    "rootDir": "./src",                  // Tu código fuente en TypeScript
-    "outDir": "./dist",                  // Si algún día hacés build tradicional
-    "strict": true,                      // Activá todas las comprobaciones fuertes
-    "esModuleInterop": true,             // Permite importar módulos CommonJS con "import"
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+      "target": "ES2020",
+      "module": "CommonJS",
+      "rootDir": "src",
+      "outDir": "dist",
+      "strict": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "skipLibCheck": true,
+      "noImplicitAny": true
   },
-  "include": ["src", "src/config.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+      "src"
+, "copySQL.js"  ],
+  "exclude": [
+      "node_modules"
+  ]
 }

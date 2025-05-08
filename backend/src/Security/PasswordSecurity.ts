@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs"
 
-export const genHashPassword = async (password: string): Promise<string> => {
+export const getHashPassword = async (password: string): Promise<string> => {
     const salt = await bcrypt.genSalt(11); 
     const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
