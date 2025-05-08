@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pm_service.routes import predict
+from routes import predict
 
 app = FastAPI(
     title="Creda - Predict Model Service",
