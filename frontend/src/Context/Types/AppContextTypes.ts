@@ -6,7 +6,7 @@ interface usersHookInterface{
     createUser: (userData: any) => Promise<boolean>;
     loginUser: (userData: any) => Promise<boolean>;
     getLocaleUserInfo: () => Partial<Record<keyof LocaleUserTypes, string>>;
-    
+    logout: () => void;
 }
 
 interface usePredictHookInterface{

@@ -1,125 +1,171 @@
-import React, { useCallback, useMemo } from 'react'
-import { globalApis } from './APIs'
-import { showNotification } from '@mantine/notifications'
+import React, { useCallback, useMemo } from "react";
+import { globalApis } from "./APIs";
+import { showNotification } from "@mantine/notifications";
 
 function useUsers() {
-    const createUser = useCallback(async (userData: any) => {
-        const url = new URL(globalApis.users + "/create-user")
-        console.log(url)
-        try {
-            const result = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(userData)
-            })
+  const createUser = useCallback(async (userData: any) => {
+    const url = new URL(globalApis.users + "/create-manager");
+    try {
+      const result = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
 
-            const responseData = await result.json()
-            if (!result.ok) {
-                showNotification({
-                    title: "No fue posible crear su cuenta",
-                    message: responseData.msg || "Error desconocido",
-                    position: "top-right",
-                    autoClose: 3500,
-                    color: "red"
-                })
-                return false
-            }
+      const responseData = await result.json();
+      if (!result.ok) {
+        showNotification({
+          title: "Could not create your account",
+          message: responseData.msg || "Unknown error",
+          position: "top-right",
+          autoClose: 3500,
+          color: "red",
+        });
+        return false;
+      }
 
-            showNotification({
-                title: "Cuenta creada con éxito",
-                message: responseData.msg,
-                position: "top-right",
-                autoClose: 3500,
-                color: "green"
-            })
+      showNotification({
+        title: "Account created successfully",
+        message: responseData.msg,
+        position: "top-right",
+        autoClose: 3500,
+        color: "green",
+      });
 
-            return true
-        } catch (error) {
-            console.log(error)
-            showNotification({
-                title: "No fue posible crear su cuenta",
-                message: error.message || "Error desconocido",
-                position: "top-right",
-                autoClose: 5000,
-                color: "red"
-            })
+      return true;
+    } catch (error) {
+      showNotification({
+        title: "Could not create your account",
+        message: error.message || "Unknown error",
+        position: "top-right",
+        autoClose: 5000,
+        color: "red",
+      });
 
-            return false;
+      return false;
+    }
+  }, []);
+
+  const loginUser = useCallback(async (userData: any) => {
+    const url = new URL(globalApis.users + "/login-manager");
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        showNotification({
+          title: "Error logging in",
+          message: responseData.msg || "Unknown error.",
+          position: "top-right",
+          autoClose: 3500,
+          color: "yellow",
+        });
+        return false;
+      }
+
+      showNotification({
+        title: "You have logged in successfully.",
+        message: responseData.msg || "One moment...",
+        position: "top-right",
+        autoClose: 2500,
+        color: "blue",
+      });
+
+      let respondeUserData =
+        responseData.userData ||
+        responseData.user ||
+        responseData.manager ||
+        {};
+
+      if (respondeUserData) {
+        const structuredUserData = {
+          manager_id:
+            respondeUserData.manager_id ||
+            respondeUserData.id ||
+            respondeUserData._id ||
+            responseData.id ||
+            responseData.userId ||
+            "unknown",
+
+          ...respondeUserData,
         };
-    }, []);
 
-    const loginUser = useCallback(async (userData: any) => {
-        const url = new URL(globalApis.users + "/login-user")
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(userData)
-            });
+        localStorage.setItem("user_data", JSON.stringify(structuredUserData));
+        localStorage.setItem("auth_status", "authenticated"); 
+      } else {
+        localStorage.setItem(
+          "user_data",
+          JSON.stringify({
+            manager_id: "default",
+            error: "No user data returned from server",
+          })
+        );
+      }
+      return true;
+    } catch (error) {
+      showNotification({
+        title: "Error logging in",
+        message: error.message || "Unknown error.",
+        position: "top-right",
+        autoClose: 5500,
+        color: "red",
+      });
+      return false;
+    }
+  }, []);
 
-            const responseData = await response.json()
-            if (!response.ok) {
-                showNotification({
-                    title: "Error al iniciar sesión",
-                    message: responseData.msg || "Error desconocido.",
-                    position: "top-right",
-                    autoClose: 3500,
-                    color: "yellow"
-                })
+  const getLocaleUserInfo = useCallback(() => {
+    const locale_user = localStorage.getItem("user_data");
 
-                return false
-            };
-            showNotification({
-                title: "Iniciaste sesión correctamente.",
-                message: responseData.msg || "Un momento...",
-                position: "top-right",
-                autoClose: 2500,
-                color: "blue"
-            })
-            const respondeUserData = responseData.userData
-            localStorage.setItem("user_data", JSON.stringify(respondeUserData))
-            return true
+    if (!locale_user) {
+      showNotification({
+        title: "User data not found.",
+        message: "Try logging in again,",
+        autoClose: 3500,
+        position: "top-right",
+        color: "yellow",
+      });
+      return undefined;
+    }
 
-        } catch (error) {
-            console.log(error)
-            showNotification({
-                title: "Error al iniciar sesión",
-                message: error.message || "Error desconocido.",
-                position: "top-right",
-                autoClose: 5500,
-                color: "red"
-            })
+    try {
+      const user_info = JSON.parse(locale_user);
 
-            return false
-        }
-    }, [])
+      if (!user_info.manager_id) {
+        user_info.manager_id = user_info.id || "default";
+      }
 
-    const getLocaleUserInfo = useCallback(() => {
-        const locale_user = localStorage.getItem("user_data")
-        if (!locale_user) {
-            showNotification({
-                title: "No se encontraron datos del usuario.",
-                message: "Intente iniciar sesion nuevamente,",
-                autoClose: 3500,
-                position: "top-right",
-                color: "yellow"
-            })
+      return user_info;
+    } catch (error) {
+      localStorage.removeItem("user_data");
+      return undefined;
+    }
+  }, []);
 
-            return undefined
-        }
-        const user_info = JSON.parse(locale_user)
-        return user_info
-    }, [loginUser])
+  const logout = useCallback(() => {
+    localStorage.removeItem("user_data");
+    localStorage.removeItem("auth_status");
+    sessionStorage.clear();
+  }, []);
 
-    return useMemo(() => ({
-        createUser, loginUser, getLocaleUserInfo
-    }), [
-        createUser, loginUser, getLocaleUserInfo
-    ])
+  return useMemo(
+    () => ({
+      createUser,
+      loginUser,
+      getLocaleUserInfo,
+      logout,
+    }),
+    [createUser, loginUser, getLocaleUserInfo, logout]
+  );
 }
 
-export default useUsers
+export default useUsers;

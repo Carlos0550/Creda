@@ -3,11 +3,21 @@ import nodemailer from "nodemailer";
 import path from "path";
 import fs from "fs";
 import { getDomain } from "../DomainHandler";
-export const transporter = nodemailer.createTransport({
+
+
+/* export const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.CREDA_EMAIL,
     pass: process.env.CREDA_EMAIL_SECRET,
+  },
+}); */
+
+export const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "servicescreda@gmail.com",
+    pass: "kivm jimm aqur ejss",
   },
 });
 

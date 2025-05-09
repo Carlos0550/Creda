@@ -6,8 +6,8 @@ import { getQueries } from "../../utils/QueriesHandler";
 import path from "path";
 import { sendEmail } from "../../utils/EmailVerification/SendEmailVerification";
 
-const queriesFolder:string = path.join(__dirname, "./Queries")
-export const CreateManagerController:RequestHandler<{},{},CreateManager,{}> = async(
+const queriesFolder: string = path.join(__dirname, "./Queries")
+export const CreateManagerController: RequestHandler<{}, {}, CreateManager, {}> = async (
     req,
     res
 ): Promise<void> => {
@@ -19,7 +19,7 @@ export const CreateManagerController:RequestHandler<{},{},CreateManager,{}> = as
 
     const hashedPsw = await getHashPassword(manager_password)
     const { "createManager.sql": CMQueries } = getQueries(queriesFolder)
-    if(!CMQueries){
+    if (!CMQueries) {
         res.status(400).json({
             msg: "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
@@ -32,21 +32,21 @@ export const CreateManagerController:RequestHandler<{},{},CreateManager,{}> = as
     try {
         client = await pool.connect();
         await client.query("BEGIN")
-        const result1 = await client.query(CMQueries[0],[
+        const result1 = await client.query(CMQueries[0], [
             manager_email
         ])
 
-        if(result1.rows[0].count > 0){
+        if (result1.rows[0].count > 0) {
             throw new Error("El email ingresado ya se encuentra registrado.")
         }
 
-        const result2 = await client.query(CMQueries[1],[
+        const result2 = await client.query(CMQueries[1], [
             manager_name,
             manager_email,
             hashedPsw
         ])
 
-        if(result2.rowCount! > 0){
+        if (result2.rowCount! > 0) {
             await sendEmail({
                 to: manager_email,
                 subject: "Bienvenido a Creda!",
@@ -67,22 +67,22 @@ export const CreateManagerController:RequestHandler<{},{},CreateManager,{}> = as
         res.status(400).json({
             msg: error instanceof Error ? error.message : "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
-    }finally{
+    } finally {
         client && client.release()
     }
-    
+
 }
 
-export const LoginManagerController:RequestHandler<{},{},{},LoginManager> = async(
+export const LoginManagerController: RequestHandler<{}, {}, LoginManager, {}> = async (
     req,
     res
 ): Promise<void> => {
     const {
         manager_email,
         manager_password
-    } = req.query
+    } = req.body  
     const { "loginManager.sql": LMQueries } = getQueries(queriesFolder)
-    if(!LMQueries){
+    if (!LMQueries) {
         res.status(400).json({
             msg: "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
@@ -94,10 +94,10 @@ export const LoginManagerController:RequestHandler<{},{},{},LoginManager> = asyn
 
     try {
         client = await pool.connect();
-        const result1 = await client.query(LMQueries[0],[
+        const result1 = await client.query(LMQueries[0], [
             manager_email
         ])
-        if(result1.rows[0].count === "0"){
+        if (result1.rows[0].count === "0") {
             res.status(404).json({
                 msg: "El email ingresado no existe, verifique que el email sea el correcto."
             })
@@ -105,13 +105,13 @@ export const LoginManagerController:RequestHandler<{},{},{},LoginManager> = asyn
             return;
         }
 
-        const result2 = await client.query(LMQueries[1],[
+        const result2 = await client.query(LMQueries[1], [
             manager_email,
         ])
 
         const manager = result2.rows[0]
 
-        if(manager.manager_verified === false){
+        if (manager.manager_verified === false) {
             res.status(404).json({
                 msg: "Su cuenta no ha sido verificada, revise la casilla de spam si no lo ha recibido."
             })
@@ -126,14 +126,14 @@ export const LoginManagerController:RequestHandler<{},{},{},LoginManager> = asyn
 
         const isPswCorrect = await comparePassword(manager_password, manager.manager_password)
 
-        if(!isPswCorrect){
+        if (!isPswCorrect) {
             res.status(404).json({
                 msg: "La contraseña ingresada es incorrecta, verifique que la contraseña sea la correcta."
             })
             return;
         }
 
-        const {manager_password:_, ...rest} = manager
+        const { manager_password: _, ...rest } = manager
 
         res.status(200).json({
             msg: "Administrador logueado con exito!",
@@ -146,37 +146,37 @@ export const LoginManagerController:RequestHandler<{},{},{},LoginManager> = asyn
         res.status(400).json({
             msg: error instanceof Error ? error.message : "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
-    }finally{
+    } finally {
         client && client.release()
     }
-    
+
 }
 
-export const VerifyEmailController:RequestHandler<{},{},{},{manager_id:string}> = async(
+export const VerifyEmailController: RequestHandler<{}, {}, {}, { manager_id: string }> = async (
     req,
     res
 ): Promise<void> => {
     const {
         manager_id
     } = req.query
-    
+
     let client;
     try {
         client = await pool.connect();
-        const result = await client.query("UPDATE managers SET manager_verified = true WHERE manager_id = $1",[
+        const result = await client.query("UPDATE managers SET manager_verified = true WHERE manager_id = $1", [
             manager_id
         ])
-        if(result.rowCount! > 0){
+        if (result.rowCount! > 0) {
             res.status(200).json({
                 msg: "El correo fue verificado con exito."
             })
-    
+
             return;
-        }else{
+        } else {
             res.status(400).json({
                 msg: "El correo no pudo ser verificado."
             })
-    
+
             return;
         }
     } catch (error) {

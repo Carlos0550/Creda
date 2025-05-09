@@ -88,7 +88,7 @@ const VerifyEmail:RequestHandler<{},{},{},{manager_id:string}> = async(
 
 
 usersRouter.post("/create-manager", CreateManager, CreateManagerController)
-usersRouter.get("/login-manager", LoginManager, LoginManagerController)
+usersRouter.post("/login-manager", LoginManager, LoginManagerController)
 usersRouter.get("/verify-email", VerifyEmail, VerifyEmailController)
 
 export default usersRouter

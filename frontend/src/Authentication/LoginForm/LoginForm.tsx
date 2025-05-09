@@ -29,12 +29,12 @@ function LoginForm() {
             <Input
               placeholder="jhondoe@example.com"
               type="email"
-              name="user_email"
-              value={formValues.user_email}
+              name="manager_email"
+              value={formValues.manager_email}
               onChange={handleInputChange}
               styles={{
                 input: {
-                  borderColor: errors.user_email ? "#ef4444" : "#e2e8f0",
+                  borderColor: errors.manager_email ? "#ef4444" : "#e2e8f0",
                   borderRadius: "9999px",
                   "&:focus": {
                     borderColor: "#3b82f6",
@@ -43,8 +43,8 @@ function LoginForm() {
                 },
               }}
             />
-            {errors.user_email && (
-              <p className="mt-1 text-sm text-red-500">{errors.user_email}</p>
+            {errors.manager_email && (
+              <p className="mt-1 text-sm text-red-500">{errors.manager_email}</p>
             )}
           </Input.Wrapper>
 
@@ -60,13 +60,13 @@ function LoginForm() {
             }}
           >
             <Input
-              name="user_password"
+              name="manager_password"
               type="password"
-              value={formValues.user_password}
+              value={formValues.manager_password}
               onChange={handleInputChange}
               styles={{
                 input: {
-                  borderColor: errors.user_password ? "#ef4444" : "#e2e8f0",
+                  borderColor: errors.manager_password ? "#ef4444" : "#e2e8f0",
                   borderRadius: "9999px",
                   "&:focus": {
                     borderColor: "#3b82f6",
@@ -75,9 +75,9 @@ function LoginForm() {
                 },
               }}
             />
-            {errors.user_password && (
+            {errors.manager_password && (
               <p className="mt-1 text-sm text-red-500">
-                {errors.user_password}
+                {errors.manager_password}
               </p>
             )}
           </Input.Wrapper>

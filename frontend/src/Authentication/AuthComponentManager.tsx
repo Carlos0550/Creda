@@ -9,7 +9,7 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
-import { BsShieldCheck, BsGraphUp } from "react-icons/bs";
+import { BsCreditCard } from "react-icons/bs";
 
 function AuthComponentManager() {
   const [formOption, setFormOption] = useState<1 | 2>(2);
@@ -40,14 +40,19 @@ function AuthComponentManager() {
               Welcome to
             </Title>
 
-            <div className="flex items-center justify-center mb-3">
-              <BsShieldCheck className="text-blue-700 text-3xl mr-2" />
+            <div className="flex flex-col items-center justify-center mb-3 ">
+              <div className="mb-1 mt-4">
+                <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-800 shadow-lg p-4 border-2 border-white">
+                  <BsCreditCard className="text-white text-3xl" />
+                </div>
+              </div>
               <Title
                 order={1}
                 style={{ textAlign: "center" }}
-                className="text-blue-700 text-3xl font-bold"
+                className="text-3xl font-bold"
               >
-                Creda
+                <span className="text-black">C</span>
+                <span className="text-blue-700">reda</span>
               </Title>
             </div>
           </div>

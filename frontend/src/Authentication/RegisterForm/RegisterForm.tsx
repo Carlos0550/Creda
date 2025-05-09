@@ -30,12 +30,12 @@ function RegisterForm() {
                         <Input
                             placeholder='Jhon Doe'
                             type='text'
-                            value={formValues.user_name}
-                            name='user_name'
+                            value={formValues.manager_name}
+                            name='manager_name'
                             onChange={handleInputChange}
                             styles={{
                                 input: {
-                                    borderColor: errors?.user_name ? "#ef4444" : "#e2e8f0",
+                                    borderColor: errors?.manager_name ? "#ef4444" : "#e2e8f0",
                                     borderRadius: "9999px",
                                     "&:focus": {
                                         borderColor: "#3b82f6",
@@ -44,8 +44,8 @@ function RegisterForm() {
                                 },
                             }}
                         />
-                        {errors?.user_name && (
-                            <p className="mt-1 text-sm text-red-500">{errors?.user_name}</p>
+                        {errors?.manager_name && (
+                            <p className="mt-1 text-sm text-red-500">{errors?.manager_name}</p>
                         )}
                     </Input.Wrapper>
 
@@ -64,11 +64,11 @@ function RegisterForm() {
                             placeholder='jhondoe@example.com'
                             type='email'
                             onChange={handleInputChange}
-                            name='user_email'
-                            value={formValues.user_email}
+                            name='manager_email'
+                            value={formValues.manager_email}
                             styles={{
                                 input: {
-                                    borderColor: errors?.user_email ? "#ef4444" : "#e2e8f0",
+                                    borderColor: errors?.manager_email ? "#ef4444" : "#e2e8f0",
                                     borderRadius: "9999px",
                                     "&:focus": {
                                         borderColor: "#3b82f6",
@@ -77,8 +77,8 @@ function RegisterForm() {
                                 },
                             }}
                         />
-                        {errors?.user_email && (
-                            <p className="mt-1 text-sm text-red-500">{errors?.user_email}</p>
+                        {errors?.manager_email && (
+                            <p className="mt-1 text-sm text-red-500">{errors?.manager_email}</p>
                         )}
                     </Input.Wrapper>
 
@@ -100,12 +100,12 @@ function RegisterForm() {
                     >
                         <Input
                             onChange={handleInputChange}
-                            name='user_password'
-                            value={formValues.user_password}
+                            name='manager_password'
+                            value={formValues.manager_password}
                             type='password'
                             styles={{
                                 input: {
-                                    borderColor: errors?.user_password ? "#ef4444" : "#e2e8f0",
+                                    borderColor: errors?.manager_password ? "#ef4444" : "#e2e8f0",
                                     borderRadius: "9999px",
                                     "&:focus": {
                                         borderColor: "#3b82f6",
@@ -114,8 +114,8 @@ function RegisterForm() {
                                 },
                             }}
                         />
-                        {errors?.user_password && (
-                            <p className="mt-1 text-sm text-red-500">{errors?.user_password}</p>
+                        {errors?.manager_password && (
+                            <p className="mt-1 text-sm text-red-500">{errors?.manager_password}</p>
                         )}
                     </Input.Wrapper>
                 </div>
