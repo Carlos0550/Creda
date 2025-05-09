@@ -1,5 +1,6 @@
 export interface CreateClient{
-    client_name: string,
-    client_nationality: string,
-    client_id: string
-}
+    client_id: string,
+    client_score: number,
+    client_credit_status: "good" | "bad"
+};
+
