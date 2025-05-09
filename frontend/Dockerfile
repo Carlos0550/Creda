@@ -1,4 +1,3 @@
-# Builder
 FROM --platform=$BUILDPLATFORM node:slim AS builder
 
 WORKDIR /app
