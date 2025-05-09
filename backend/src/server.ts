@@ -3,9 +3,10 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 
 import pool from "./connections/database_conn";
-import redis from "./connections/redis_conn";
+
 import managerRouter from "./routes/manager.routes";
 import clientRouter from "./routes/clients.routes"
+
 const app = express();
 
 app.use(cors());
@@ -25,18 +26,18 @@ const testPostgresConnection = async () => {
   }
 };
 
-const testRedisConnection = async () => {
-  try {
-    await redis.set("test_key", "Redis andando....", "EX", 5);
-    const valor = await redis.get("test_key");
-    console.log("✅ Valor desde Redis:", valor);
-  } catch (error) {
-    console.log("❌ Error al iniciar la conexión a Redis:", error);
-  }
-};
+// const testRedisConnection = async () => {
+//   try {
+//     await redis.set("test_key", "Redis andando....", "EX", 5);
+//     const valor = await redis.get("test_key");
+//     console.log("✅ Valor desde Redis:", valor);
+//   } catch (error) {
+//     console.log("❌ Error al iniciar la conexión a Redis:", error);
+//   }
+// };
 
 testPostgresConnection();
-testRedisConnection();
+//testRedisConnection();
 
 app.get("/", (req: Request, res: Response) => {
   res.send("SERVER ON");
