@@ -3,7 +3,7 @@ import { RequestHandler } from "express";
 import { getQueries } from "../../utils/QueriesHandler";
 import path from "path";
 import { CreateClient } from "../../Types/clients.types";
-import { encryptData } from "../../Security/EncryptationModule";
+import { decrypt, encryptData } from "../../Security/EncryptationModule";
 
 const queriesFolder:string = path.join(__dirname, "./Queries")
 
@@ -13,7 +13,7 @@ if(!queries){
     console.log("Error en client.controller.ts: No se encontraron las Queries")
 }
 
-export const CreateClientController:RequestHandler<{},{msg: string, client_id?: string},CreateClient,{}> = async(
+export const CreateClientController:RequestHandler<{},{msg: string},CreateClient,{}> = async(
     req,res
 ): Promise<void> => {
     let client;
@@ -27,9 +27,9 @@ export const CreateClientController:RequestHandler<{},{msg: string, client_id?: 
     }
 
     const {
-        client_name,
-        client_nationality,
-        client_id
+        client_id,
+        client_credit_status,
+        client_score
     } = req.body
 
     try {
@@ -42,14 +42,13 @@ export const CreateClientController:RequestHandler<{},{msg: string, client_id?: 
         }
 
         const result2 = await pool.query(CCQueries[1],[
-            client_name,
-            client_nationality,
-            encryptedID
+            encryptedID,
+            client_score,
+            client_credit_status
         ])
         if(result2.rowCount! > 0){
             res.status(200).json({
                 msg: "El cliente fue creado con exito.",
-                client_id: (result2.rows[0].encryptedID).toString()
             })
             return;
         }
@@ -65,3 +64,72 @@ export const CreateClientController:RequestHandler<{},{msg: string, client_id?: 
         client && client.release();
     }
 }
+
+export const getClientDataController:RequestHandler<{},{},{},{client_id:string}> = async(
+    req,
+    res,
+): Promise<void> => {
+    const { client_id } = req.query
+    let client
+    const { "getClientData.sql": GCDQueries } = getQueries(queriesFolder) || { "getClientData.sql": "" }
+    if(!GCDQueries){
+        res.status(400).json({
+            msg: "Error interno del servidor, espere unos segundos e intente nuevamente."
+        })
+        console.log("Error en client.controller.ts: No se encontraron las Queries")
+        return
+    }
+
+    try {
+        client = await pool.connect();
+        const encryptedID = encryptData(client_id.toString());
+        console.log(encryptedID)
+        const result = await client.query(GCDQueries[0],[
+            encryptedID
+        ])
+
+        if(result.rowCount! > 0){
+            res.status(200).json({
+                msg: "Cliente encontrado con éxito.",
+                client_id: decrypt(result.rows[0].client_id),
+                client_credit_status: result.rows[0].client_credit_status,
+                client_score: result.rows[0].client_credit_scoring
+            })
+            return;
+        }else{
+            res.status(400).json({
+                msg: "El cliente no pudo ser encontrado."
+            })
+            return
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({
+            msg: "Error interno del servidor, espere unos segundos e intente nuevamente."
+        })
+        return
+    }finally{
+        client && client.release();
+    }
+
+}
+
+//Por el momento no guardamos archivos
+// export const SaveClientsData: RequestHandler<{},{},{},{}> = async(
+//     req,
+//     res
+// ): Promise<void> => {
+//     const file = req.file as Express.Multer.File
+//     const redisKey = `client_file:${file.originalname}`;
+
+//     try {
+//         const fileData = {
+//             file_name: file.originalname,
+//             file_path: `/uploads/${file.originalname}`,
+//             file_type: file.mimetype,
+//             file_size: file.size
+//         }
+//     } catch (error) {
+        
+//     }
+// }
