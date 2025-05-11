@@ -47,12 +47,12 @@ export const CreateManagerController: RequestHandler<{}, {}, CreateManager, {}> 
         ])
 
         if (result2.rowCount! > 0) {
-            await sendEmail({
-                to: manager_email,
-                subject: "Bienvenido a Creda!",
-                user_name: manager_name,
-                user_id: result2.rows[0].manager_id
-            })
+            // await sendEmail({
+            //     to: manager_email,
+            //     subject: "Bienvenido a Creda!",
+            //     user_name: manager_name,
+            //     user_id: result2.rows[0].manager_id
+            // })
             res.status(200).json({
                 msg: "Administrador creado con exito, se le envió un correo de validación."
             })

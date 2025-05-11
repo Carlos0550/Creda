@@ -9,8 +9,6 @@ CREATE TABLE managers(
 CREATE TYPE credit_status_types AS ENUM('good', 'bad');
 CREATE TABLE clients(
 	client_id TEXT NOT NULL UNIQUE PRIMARY KEY,
-	client_name TEXT NOT NULL,
-	client_nationality TEXT NOT NULL,
 	client_credit_scoring NUMERIC,
 	client_credit_status credit_status_types
 );
