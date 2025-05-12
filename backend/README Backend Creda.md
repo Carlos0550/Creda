@@ -85,6 +85,56 @@ interface LoginManager {
 
 ---
 
+### ▶️ DELETE `/delete-all-managers`
+
+**Descripción:** Permite eliminar todos los administradores (SOLO EN CASO DE TESTING)
+
+**Validaciones:**
+
+* No hay validaciones
+
+**Respuestas posibles:**
+
+* `200 OK`: Todos los administradores fueron eliminados
+* `400 Bad Request | 500`: Error de servidor o desconocido.
+
+---
+
+### ▶️ POST `/send-password-reset-email?manager_email=...`
+
+**Descripción:** Envía un correo de inicio de recuperación de contraseña.
+
+**Query param:**
+
+* `manager_email` (string): obligatorio.
+---
+
+### ▶️ POST `/verify-password-reset-email`
+**No usable desde el Frontend**
+
+**Descripción:** Envía un correo de inicio de recuperación de contraseña.
+**Body esperado:**
+
+```ts
+interface ResetManagerPassword{
+    manager_id: string,
+    new_password: string
+    confirm_password: string
+    email: string;
+    url_id: string
+}
+```
+---
+
+### ▶️ POST `/reset-password`
+/reset-password
+**No usable desde el Frontend**
+
+**Descripción:** Envía un HTML para recuperación de contraseña.
+
+```
+---
+
 ## 👤 Rutas para Clientes (`/api/clients`)
 
 ### ▶️ POST `/create-client`

@@ -21,6 +21,3 @@ CREATE TABLE recovery_manager (
   expires_at TIMESTAMP,
   CONSTRAINT fk_recovery_manager_id FOREIGN KEY (manager_id) REFERENCES managers(manager_id)
 );
-
-DROP TABLE IF EXISTS managers CASCADE;
-ALTER TABLE managers ALTER COLUMN manager_verified SET DEFAULT false;
