@@ -146,6 +146,13 @@ const ResetManagerPasswordRouter: RequestHandler<{},{},ResetManagerPassword,{}> 
         })
         return
     }
+
+    if(!validator.isUUID(body.url_id) || !validator.isUUID(body.manager_id)){
+        res.status(400).json({
+            msg: "El enlace de restablecimiento de contraseñas no es valido."
+        })
+        return
+    }
     
     let client;
     try {
@@ -206,6 +213,13 @@ const ResetPasswordRouter: RequestHandler<{},{},{},{
     if(!url_id || !manager_id){
         res.status(400).json({
             msg: "Enlace de restablecimiento de contraseña no valido."
+        })
+        return
+    }
+
+    if(!validator.isUUID(url_id) || !validator.isUUID(manager_id)){
+        res.status(400).json({
+            msg: "El enlace de restablecimiento de contraseñas no es valido."
         })
         return
     }
