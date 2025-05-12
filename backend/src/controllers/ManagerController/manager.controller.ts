@@ -216,6 +216,7 @@ export const deleteAllManagers: RequestHandler = async (
         res.status(400).json({
             msg: error instanceof Error ? error.message : "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
+        return;
     }finally{
         client && client.release()
     }
@@ -250,14 +251,14 @@ export const sendPasswordResetEmail: RequestHandler<{}, {}, {}, { manager_email:
         const manager = result2.rows[0]
 
         if (manager.manager_verified === false) {
-            res.status(404).json({
-                msg: "Su cuenta no ha sido verificada, revise la casilla de spam si no lo ha recibido."
-            })
             await sendEmail({
                 to: manager_email,
                 subject: "Bienvenido a Creda!",
                 user_name: manager.manager_name,
                 user_id: manager.manager_id
+            })
+            res.status(404).json({
+                msg: "Su cuenta no ha sido verificada, revise la casilla de spam si no lo ha recibido."
             })
             return
         }
@@ -287,6 +288,8 @@ export const sendPasswordResetEmail: RequestHandler<{}, {}, {}, { manager_email:
         res.status(200).json({
             msg: "El correo fue enviado con exito."
         })
+
+        return;
     } catch (error) {
         console.log(error)
         res.status(400).json({
@@ -347,11 +350,13 @@ export const resetManagerPassword: RequestHandler<{}, {}, ResetManagerPassword, 
             res.status(200).json({
                 msg: "La contraseña fue restablecida con exito."
             })
+            return;
         } else {
             await client.query("ROLLBACK")
             res.status(400).json({
                 msg: "La contraseña no pudo ser restablecida."
             })
+            return;
         }
     } catch (error) {
         console.log(error)
