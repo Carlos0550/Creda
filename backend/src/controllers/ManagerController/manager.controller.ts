@@ -187,6 +187,8 @@ export const VerifyEmailController: RequestHandler<{}, {}, {}, { manager_id: str
         })
 
         return;
+    }finally{
+        client && client.release()
     }
 }
 
@@ -214,6 +216,8 @@ export const deleteAllManagers: RequestHandler = async (
         res.status(400).json({
             msg: error instanceof Error ? error.message : "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
+    }finally{
+        client && client.release()
     }
 }
 
@@ -288,6 +292,8 @@ export const sendPasswordResetEmail: RequestHandler<{}, {}, {}, { manager_email:
         res.status(400).json({
             msg: error instanceof Error ? error.message : "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
+    }finally{
+        client && client.release()
     }
 }
 
@@ -353,5 +359,7 @@ export const resetManagerPassword: RequestHandler<{}, {}, ResetManagerPassword, 
         res.status(400).json({
             msg: error instanceof Error ? error.message : "Error interno del servidor, espere unos segundos e intente nuevamente."
         })
+    }finally{
+        client && client.release()
     }
 }
