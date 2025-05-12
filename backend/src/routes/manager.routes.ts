@@ -187,7 +187,6 @@ const ResetManagerPasswordRouter: RequestHandler<{},{},ResetManagerPassword,{}> 
     }finally{
         client && client.release()
     }
-    next()
 }
 
 const ResetPasswordRouter: RequestHandler<{},{},{},{
