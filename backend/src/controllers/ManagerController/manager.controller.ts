@@ -199,6 +199,7 @@ export const deleteAllManagers: RequestHandler = async (
         client = await pool.connect();
         await client.query("BEGIN")
         const result = await client.query("DELETE FROM managers")
+        console.log(result.rows[0])
         if (result.rowCount! > 0) {
             await client.query("COMMIT")
             res.status(200).json({
