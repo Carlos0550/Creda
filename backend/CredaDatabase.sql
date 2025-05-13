@@ -13,6 +13,7 @@ CREATE TABLE clients(
 	client_credit_status credit_status_types
 );
 
+
 CREATE TABLE recovery_manager (
   recovery_id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   manager_id UUID NOT NULL,
