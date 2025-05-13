@@ -1,7 +1,7 @@
 import pool from "../../connections/database_conn";
 import { randomUUID } from "crypto";
 
-const getRandomCreditScore = () => Number((Math.random() * 1000).toFixed(2));
+const getRandomCreditScore = () => Number((Math.random() * 100).toFixed(2));
 const getRandomCreditStatus = (): 'good' | 'bad' =>
     Math.random() < 0.5 ? 'good' : 'bad';
 
