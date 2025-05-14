@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@mantine/core": "^7.17.2",
     "@mantine/dates": "^7.17.2",
     "@mantine/dropzone": "^7.17.2",
@@ -18,10 +20,14 @@
     "@mantine/modals": "^7.17.2",
     "@mantine/notifications": "^7.17.2",
     "@mantine/nprogress": "^7.17.2",
+    "@mui/material": "^7.1.0",
+    "@mui/x-data-grid": "^8.3.0",
     "@tailwindcss/vite": "^4.1.5",
+    "@types/papaparse": "^5.3.16",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.9.4",
     "oidc-client-ts": "^3.2.0",
+    "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",

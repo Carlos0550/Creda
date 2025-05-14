@@ -1,9 +1,21 @@
+.container {
+  width: 100%;
+  max-width: 1280px; /* Matches Tailwind's max-w-7xl */
+}
 
+/* Ensure the main content adapts to zoom levels */
+.main-content {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Animation already defined */
 @keyframes animate-fade-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  .animate-fade-in {
-    animation: animate-fade-in 0.2s ease-out forwards;
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: animate-fade-in 0.2s ease-out forwards;
+}

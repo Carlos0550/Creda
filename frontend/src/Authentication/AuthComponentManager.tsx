@@ -20,36 +20,37 @@ function AuthComponentManager() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gray-50">
       <Container size="xs" p={0} className="w-full max-w-md">
         <Paper
           radius="lg"
           shadow="md"
-          p="xl"
+          p="md"
+          px="lg"
           className="border border-gray-100"
           style={{
             backgroundColor: "white",
           }}
         >
-          <div className="flex flex-col items-center mb-4">
+          <div className="flex flex-col items-center mt-4">
             <Title
               order={2}
               style={{ textAlign: "center" }}
-              className="text-slate-700 text-lg font-medium mb-1"
+              className="text-slate-700 text-base sm:text-lg font-medium mb-1"
             >
               Welcome to
             </Title>
 
-            <div className="flex flex-col items-center justify-center mb-3 ">
-              <div className="mb-1 mt-4">
-                <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-800 shadow-lg p-4 border-2 border-white">
-                  <BsCreditCard className="text-white text-3xl" />
+            <div className="flex flex-col items-center justify-center mb-3">
+              <div className="mb-1 mt-3 sm:mt-4">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-800 shadow-lg p-3 sm:p-4 border-2 border-white">
+                  <BsCreditCard className="text-white text-2xl sm:text-3xl" />
                 </div>
               </div>
               <Title
                 order={1}
                 style={{ textAlign: "center" }}
-                className="text-3xl font-bold"
+                className="text-2xl sm:text-3xl font-bold"
               >
                 <span className="text-black">C</span>
                 <span className="text-blue-700">reda</span>
@@ -61,7 +62,7 @@ function AuthComponentManager() {
             {formOption === 1 ? <RegisterForm /> : <LoginForm />}
           </div>
 
-          <div className="mt-8 relative">
+          <div className="mt-4 sm:mt-4 relative">
             <Button
               variant="subtle"
               onClick={() => handleSwitchForm(formOption === 1 ? 2 : 1)}
@@ -73,7 +74,7 @@ function AuthComponentManager() {
                 root: {
                   border: "1px solid #e5e7eb",
                   borderRadius: "9999px",
-                  padding: "0.625rem 1rem",
+                  padding: "0.5rem 1rem",
                   "&:hover": {
                     backgroundColor: "transparent",
                   },
@@ -101,6 +102,14 @@ function AuthComponentManager() {
           }
           .form-container {
             position: relative;
+            width: 100%;
+          }
+          
+          @media (max-width: 480px) {
+            .form-container input,
+            .form-container button {
+              font-size: 14px;
+            }
           }
         `}
       </style>

@@ -1,4 +1,9 @@
 fastapi
 uvicorn
 pandas
+numpy
+xgboost
+scikit-learn
 python-multipart
+matplotlib
+seaborn

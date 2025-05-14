@@ -5,15 +5,15 @@
     width: 100%;
     min-height: 100vh;
     background-color: #000;
-    
-  }
+    padding: 1rem;
+}
   
-  .auth-container-items {
+.auth-container-items {
     width: 100%;
     max-width: 500px;
     background-color: #2e2e2e;
     border-radius: 12px;
-    padding: 2rem;
+    padding: 1.5rem;
     box-shadow:
       0 10px 25px rgba(255, 255, 255, 0.08),
       0 4px 8px rgba(255, 255, 255, 0.04),
@@ -21,16 +21,31 @@
     backdrop-filter: blur(4px);
     transition: all 0.4s ease;
     animation: fadeIn 0.6s ease forwards;
-  }
+}
   
-  .auth-container-items h1 {
+.auth-container-items h1 {
     color: white;
     text-align: center;
-    font-size: 28px;
+    font-size: 24px;
     margin-bottom: 1.5rem;
-  }
+}
+
+/* Media queries para responsividad */
+@media (min-width: 640px) {
+    .auth-container {
+        padding: 1.5rem;
+    }
+    
+    .auth-container-items {
+        padding: 2rem;
+    }
+    
+    .auth-container-items h1 {
+        font-size: 28px;
+    }
+}
   
-  @keyframes fadeIn {
+@keyframes fadeIn {
     from {
       opacity: 0;
       transform: translateY(-20px);
@@ -40,5 +55,17 @@
       opacity: 1;
       transform: translateY(0);
     }
-  }
-  
+}
+
+/* Ajustes adicionales para formularios dentro del contenedor */
+.auth-container-items input,
+.auth-container-items button {
+    font-size: 14px;
+}
+
+@media (min-width: 640px) {
+    .auth-container-items input,
+    .auth-container-items button {
+        font-size: 16px;
+    }
+}

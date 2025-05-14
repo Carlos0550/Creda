@@ -96,7 +96,7 @@ function RegisterForm() {
                                 color: "#64748b",
                             },
                         }}
-                        description="It must be a secure password between 8 and 24 characters."
+                        
                     >
                         <Input
                             onChange={handleInputChange}

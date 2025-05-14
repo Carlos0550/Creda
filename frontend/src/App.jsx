@@ -6,6 +6,7 @@ import "./App.css"
 import AuthComponentManager from './Authentication/AuthComponentManager'
 import Home from './Home/Home'
 import Layout from './Layout/Layout'
+import Data from './Data/Data' 
 import ProtectedRoute from './Authentication/ProtectedRoute'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path='/home' element={<AuthComponentManager />} />
         <Route element={<ProtectedRoute />}> 
           <Route path='/home/:manager_id' element={<Layout content={<Home />} />} />
+          <Route path="/data/:manager_id" element={<Layout content={<Data />} />} />
         </Route>
       </Routes>
     </div>
