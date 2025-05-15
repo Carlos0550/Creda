@@ -111,25 +111,37 @@ export const getClientDataController:RequestHandler<{},{},{},{client_id:string}>
     }finally{
         client && client.release();
     }
-
 }
 
-//Por el momento no guardamos archivos
-// export const SaveClientsData: RequestHandler<{},{},{},{}> = async(
-//     req,
-//     res
-// ): Promise<void> => {
-//     const file = req.file as Express.Multer.File
-//     const redisKey = `client_file:${file.originalname}`;
+export const GetAllClientsController:RequestHandler<{},{},{},{}> = async(
+  req,
+  res
+): Promise<void> => {
+    let client;
 
-//     try {
-//         const fileData = {
-//             file_name: file.originalname,
-//             file_path: `/uploads/${file.originalname}`,
-//             file_type: file.mimetype,
-//             file_size: file.size
-//         }
-//     } catch (error) {
-        
-//     }
-// }
+    try {
+        client = await pool.connect();
+        const result = await client.query("SELECT * FROM clients TABLESAMPLE SYSTEM (0.1) LIMIT 30;")
+        if(result.rowCount! > 0){
+            res.status(200).json({
+                msg: "Clientes obtenidos con éxito.",
+                rowsCount: result.rowCount,
+                clients: result.rows
+            })
+            return
+        }
+
+        res.status(400).json({
+            msg: "Un error ocurrio al obtener los clientes."
+        })
+        return
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({
+            msg: "Error interno del servidor, espere unos segundos e intente nuevamente."
+        })
+        return
+    }finally{
+        client && client.release();
+    }
+}
