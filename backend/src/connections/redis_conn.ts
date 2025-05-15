@@ -6,7 +6,12 @@ import Redis from "ioredis";
 //   port: 6379,
 // });
 
-const redis = new Redis(process.env.REDIS_PUBLIC_URL || ""); 
+const redis = process.env.NODE_ENV === "production"
+? new Redis(process.env.REDIS_PUBLIC_URL || "")
+: new Redis({
+  host: "localhost",
+  port: 6379
+}); 
 
 redis.on('connect', () => {
   console.log('🔌 Conectado a Redis');
