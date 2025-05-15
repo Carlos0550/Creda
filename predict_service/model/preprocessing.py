@@ -14,12 +14,14 @@ from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, MinMaxScaler
 from sklearn.impute import SimpleImputer
 
 
-def predictions_data(modeling_data):
-    id_clients = modeling_data["ID_CLIENT"]
-    # Eliminar columnas innecesarias
-    if id_clients is None:
-        id_clients = 0
+def predictions_data(modeling_data, is_prediction=False):
+    id_clients = (
+        modeling_data["ID_CLIENT"]
+        if "ID_CLIENT" in modeling_data.columns
+        else range(len(modeling_data))
+    )
 
+    # Eliminar columnas innecesarias
     modeling_data["HAS_CREDIT_CARD"] = modeling_data[
         [
             "FLAG_VISA",
@@ -127,9 +129,17 @@ def predictions_data(modeling_data):
 
     target_variable = "TARGET_LABEL_BAD=1"
 
-    # Crear dataset reducido
-    selected_features_with_target = selected_features_final + [target_variable]
-    modeling_data = modeling_data[selected_features_with_target].copy()
+    # Crear dataset reducido según si es predicción o no
+    if not is_prediction and target_variable in modeling_data.columns:
+        selected_features_with_target = selected_features_final + [target_variable]
+    else:
+        selected_features_with_target = selected_features_final
+
+    # Seleccionar solo columnas que realmente existen en el DataFrame
+    existing_columns = [
+        col for col in selected_features_with_target if col in modeling_data.columns
+    ]
+    modeling_data = modeling_data[existing_columns].copy()
 
     return modeling_data, id_clients
 
