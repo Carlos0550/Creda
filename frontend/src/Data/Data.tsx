@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { loadDataset } from "./utils/DatasetLoading";
-import { ScoreModal, checkClientScore } from "./utils/CheckScore"; 
+import { ScoreModal, checkClientScore } from "./utils/CheckScore";
 import {
   DataGrid,
   GridColDef,
@@ -9,7 +9,7 @@ import {
   GridLogicOperator,
 } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
-import { url_predict } from "../Context/APIs"; 
+import { url_predict, globalApis } from "../Context/APIs";
 
 // Custom toolbar with prominent search
 function CustomToolbar() {
@@ -53,11 +53,11 @@ function CustomToolbar() {
 }
 
 function Data() {
-  const [data, setData] = useState<any[]>([]); 
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [totalRows, setTotalRows] = useState<number>(0); 
+  const [totalRows, setTotalRows] = useState<number>(0);
   const [clientId, setClientId] = useState<string>("");
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -119,13 +119,36 @@ function Data() {
       const formData = new FormData();
       formData.append("file", csvFile);
 
-      const response = await fetch(url_predict, {
+      // PASO 1: Guardar el CSV en el backend primero
+      const backendResponse = await fetch(`${globalApis.clients}/save-csv`, {
         method: "POST",
         body: formData,
       });
 
+      if (!backendResponse.ok) {
+        throw new Error(
+          `Error guardando archivo: ${
+            backendResponse.status
+          } - ${await backendResponse.text()}`
+        );
+      }
+
+      const saveResult = await backendResponse.json();
+      console.log("Archivo guardado en backend:", saveResult);
+
+      // PASO 2: Enviar para predicción (mismo archivo)
+      const predictFormData = new FormData();
+      predictFormData.append("file", csvFile);
+
+      const response = await fetch(url_predict, {
+        method: "POST",
+        body: predictFormData,
+      });
+
       if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${await response.text()}`);
+        throw new Error(
+          `Error en predicción: ${response.status} - ${await response.text()}`
+        );
       }
 
       const results = await response.json();
@@ -133,8 +156,8 @@ function Data() {
       setPredictionResults(results);
       setShowResults(true);
     } catch (err: any) {
-      console.error("Error uploading CSV:", err);
-      setUploadError(err.message || "Error al subir el archivo CSV");
+      console.error("Error en el proceso:", err);
+      setUploadError(err.message || "Error al procesar el archivo CSV");
     } finally {
       setIsUploading(false);
     }
@@ -263,46 +286,56 @@ function Data() {
         </div>
       </div>
 
-{showResults && predictionResults && (
-  <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
-    <div className="flex justify-between items-center mb-2">
-      <h3 className="font-bold text-lg text-green-800">
-        Prediction results
-      </h3>
-    </div>
-    
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">ID Client</th>
-            <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">Credit Scoring</th>
-            <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {predictionResults.predictions.map((client) => (
-            <tr key={client.client_id} className="hover:bg-gray-50">
-              <td className="py-2 px-4 border-b">{client.client_id}</td>
-              <td className="py-2 px-4 border-b">{(client.client_credit_scoring * 100).toFixed(2)}%</td>
-              <td className={`py-2 px-4 border-b ${
-                client.client_credit_status === "good" 
-                  ? "text-green-600 font-medium" 
-                  : "text-red-600 font-medium"
-              }`}>
-                {client.client_credit_status.toUpperCase()}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    
-    <div className="mt-2 text-sm text-gray-600">
-      Total clientes analizados: {predictionResults.count}
-    </div>
-  </div>
-)}
+      {showResults && predictionResults && (
+        <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-bold text-lg text-green-800">
+              Prediction results
+            </h3>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">
+                    ID Client
+                  </th>
+                  <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">
+                    Credit Scoring
+                  </th>
+                  <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {predictionResults.predictions.map((client) => (
+                  <tr key={client.client_id} className="hover:bg-gray-50">
+                    <td className="py-2 px-4 border-b">{client.client_id}</td>
+                    <td className="py-2 px-4 border-b">
+                      {(client.client_credit_scoring * 100).toFixed(2)}%
+                    </td>
+                    <td
+                      className={`py-2 px-4 border-b ${
+                        client.client_credit_status === "good"
+                          ? "text-green-600 font-medium"
+                          : "text-red-600 font-medium"
+                      }`}
+                    >
+                      {client.client_credit_status.toUpperCase()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-2 text-sm text-gray-600">
+            Total clientes analizados: {predictionResults.count}
+          </div>
+        </div>
+      )}
 
       {uploadError && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-md p-4">

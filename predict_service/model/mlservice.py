@@ -108,7 +108,7 @@ def predict(model, data):
                 {
                     "client_id": str(client_id),
                     "client_credit_scoring": float(prob),
-                    "client_credit_status": "good" if prob > 0.5 else "bad",
+                    "client_credit_status": "bad" if prob > 0.5 else "good",
                 }
             )
 

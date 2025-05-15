@@ -8,3 +8,4 @@ python-multipart
 matplotlib
 seaborn
 httpx
+requests
