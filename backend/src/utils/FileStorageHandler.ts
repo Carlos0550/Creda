@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
         cb(null, UploadsFolder);
     },
     filename: function (req, file, cb) {
-        cb(null, randomUUID() + "-" + file.originalname);
+        cb(null, randomUUID().slice(0,8) + "-" + file.originalname);
     },
 });
 
