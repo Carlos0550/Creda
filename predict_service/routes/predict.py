@@ -9,8 +9,8 @@ from model.mlservice import predict
 router = APIRouter()
 
 # URL del servicio de backend (ajusta según tu configuración de Docker)
-BACKEND_URL = "http://backend:5000/api/clients/create-client"
-BACKEND_URL_DELETE = "http://backend:5000/api/clients/test/delete-all-clients"
+BACKEND_URL = "https://creda-development.up.railway.app/api/clients/create-client"
+BACKEND_URL_DELETE = "https://creda-development.up.railway.app/api/clients/test/delete-all-clients"
 # Para pruebas locales usa: "http://localhost:5000/api/clients/create-client"
 
 
