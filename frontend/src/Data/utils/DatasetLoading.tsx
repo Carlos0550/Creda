@@ -9,7 +9,7 @@ export const loadDataset = async (options: LoadDatasetOptions) => {
   try {
     // Verificamos que se haya proporcionado un archivo
     if (!options || !options.file) {
-      throw new Error("No se ha proporcionado ningún archivo para cargar");
+      throw new Error("No file provided for upload");
     }
 
     console.log("Loading CSV from user upload:", options.file.name);
@@ -23,7 +23,7 @@ export const loadDataset = async (options: LoadDatasetOptions) => {
     });
 
     if (!csvText || csvText.trim().length === 0) {
-      throw new Error("El archivo CSV está vacío");
+      throw new Error("The CSV file is empty");
     }
 
     console.log(
@@ -45,7 +45,7 @@ export const loadDataset = async (options: LoadDatasetOptions) => {
 
           if (!results.data || results.data.length === 0) {
             console.error("No data found after parsing CSV");
-            reject(new Error("No se encontraron datos en el CSV"));
+            reject(new Error("No data found in the CSV"));
             return;
           }
 

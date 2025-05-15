@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { loadDataset } from "./utils/DatasetLoading";
-import { ScoreModal, checkClientScore } from "./utils/CheckScore"; // Add this import
+import { ScoreModal, checkClientScore } from "./utils/CheckScore"; 
 import {
   DataGrid,
   GridColDef,
@@ -9,6 +9,7 @@ import {
   GridLogicOperator,
 } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
+import { url_predict } from "../Context/APIs"; 
 
 // Custom toolbar with prominent search
 function CustomToolbar() {
@@ -52,11 +53,11 @@ function CustomToolbar() {
 }
 
 function Data() {
-  const [data, setData] = useState<any[]>([]); // Iniciar con array vacío
+  const [data, setData] = useState<any[]>([]); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(10);
-  const [totalRows, setTotalRows] = useState<number>(0); // Iniciar con 0
+  const [totalRows, setTotalRows] = useState<number>(0); 
   const [clientId, setClientId] = useState<string>("");
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -115,11 +116,10 @@ function Data() {
         throw new Error("Parsed data is not an array");
       }
 
-      // Proceder con la predicción como antes...
       const formData = new FormData();
       formData.append("file", csvFile);
 
-      const response = await fetch("http://localhost:8000/predict", {
+      const response = await fetch(url_predict, {
         method: "POST",
         body: formData,
       });
@@ -263,35 +263,46 @@ function Data() {
         </div>
       </div>
 
-      {showResults && predictionResults && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-bold text-lg text-green-800">
-              Resultados de Predicción
-            </h3>
-            <button
-              onClick={() => setShowResults(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
-          <pre className="text-sm overflow-x-auto bg-white p-3 rounded border border-green-200">
-            {JSON.stringify(predictionResults, null, 2)}
-          </pre>
-        </div>
-      )}
+{showResults && predictionResults && (
+  <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+    <div className="flex justify-between items-center mb-2">
+      <h3 className="font-bold text-lg text-green-800">
+        Prediction results
+      </h3>
+    </div>
+    
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-200">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">ID Client</th>
+            <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">Credit Scoring</th>
+            <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {predictionResults.predictions.map((client) => (
+            <tr key={client.client_id} className="hover:bg-gray-50">
+              <td className="py-2 px-4 border-b">{client.client_id}</td>
+              <td className="py-2 px-4 border-b">{(client.client_credit_scoring * 100).toFixed(2)}%</td>
+              <td className={`py-2 px-4 border-b ${
+                client.client_credit_status === "good" 
+                  ? "text-green-600 font-medium" 
+                  : "text-red-600 font-medium"
+              }`}>
+                {client.client_credit_status.toUpperCase()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    
+    <div className="mt-2 text-sm text-gray-600">
+      Total clientes analizados: {predictionResults.count}
+    </div>
+  </div>
+)}
 
       {uploadError && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-md p-4">

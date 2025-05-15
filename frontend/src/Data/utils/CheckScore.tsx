@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { globalApis } from "../../Context/APIs";
 
 interface ClientScoreData {
   msg: string;
@@ -19,9 +20,7 @@ export const checkClientScore = async (
   clientId: string
 ): Promise<ClientScoreData> => {
   try {
-    const response = await fetch(
-      `https://creda-development.up.railway.app/api/clients/get-client-data?client_id=${clientId}`
-    );
+    const response = await fetch(globalApis.getClientData(clientId));
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -35,6 +34,7 @@ export const checkClientScore = async (
     throw error;
   }
 };
+
 
 export const ScoreModal: React.FC<ScoreAlertProps> = ({
   isOpen,
