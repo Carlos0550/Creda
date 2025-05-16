@@ -239,14 +239,36 @@ function Data() {
               className="flex items-center space-x-3"
             >
               <div className="relative">
-                <input
-                  type="file"
-                  accept=".csv"
-                  className="border border-gray-300 rounded-lg py-2 px-3 text-base shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  onChange={(e) =>
-                    setCsvFile(e.target.files ? e.target.files[0] : null)
-                  }
-                />
+                <label className="bg-white border border-gray-300 rounded-lg py-2 px-4 text-base shadow-sm hover:bg-gray-50 cursor-pointer inline-flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  Choose file
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="hidden"
+                    onChange={(e) =>
+                      setCsvFile(e.target.files ? e.target.files[0] : null)
+                    }
+                  />
+                </label>
+                {csvFile && (
+                  <span className="ml-2 text-sm text-gray-600">
+                    {csvFile.name}
+                  </span>
+                )}
               </div>
               <button
                 type="submit"
