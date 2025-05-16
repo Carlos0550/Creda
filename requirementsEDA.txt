@@ -1,0 +1,15 @@
+boto3
+Jupyter
+xlrd
+black
+flake8
+gdown
+isort
+matplotlib
+numpy
+pandas
+pytest
+scikit-learn
+seaborn
+chardet
+xgboost
