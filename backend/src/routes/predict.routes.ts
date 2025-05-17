@@ -194,6 +194,5 @@ const SavePrediction: RequestHandler<{}, {}, PredictionResult, {prediction_resul
 predictRoutes.get("/prediction-status", getPredictionStatus)
 predictRoutes.get("/get-pending-predictions", getPendingPredictions)
 predictRoutes.post("/start-prediction", StartPredictionRouter);
-predictRoutes.post("/save-prediction",)
 
 export default predictRoutes
