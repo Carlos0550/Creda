@@ -39,20 +39,23 @@ def load_model():
         ratio = 1.0
 
     model = XGBClassifier(
-        n_estimators=200,
-        max_depth=5,
-        learning_rate=0.05,
-        colsample_bytree=0.8,
-        subsample=0.8,
-        gamma=0.2,
-        min_child_weight=1,
-        reg_alpha=0.1,
+        subsample=0.9,
+        scale_pos_weight=np.float64(3.3860500668832407),
         reg_lambda=1,
-        scale_pos_weight=ratio,
-        base_score=0.5,
-        random_state=42,
-        eval_metric="logloss",
+        reg_alpha=5,
+        objective='binary:logistic',
+        n_estimators=500,
+        min_child_weight=10,
+        max_depth=6,
+        max_delta_step=0,
+        learning_rate=0.02,
+        gamma=0.1,
+        colsample_bytree=1.0,
+        booster='gbtree',
         use_label_encoder=False,
+        eval_metric='logloss',
+        random_state=42,
+        base_score=0.5
     )
     model.fit(train_data, y_train)
     return model
