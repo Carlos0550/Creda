@@ -58,7 +58,8 @@ const StartPredictionRouter: RequestHandler<{}, {}, SelectedFeatures, {}> = asyn
         const redisKey = `prediction:${key}`;
         const predictionData = {
             ...body,
-            status: 'pending'
+            status: 'pending',
+            created_at: dayjs().format('YYYY-MM-DD HH:mm:ss')
         };
         await redis.hset(redisKey, predictionData);
         res.status(200).json({
@@ -111,12 +112,17 @@ const getPredictionStatus: RequestHandler<{}, {}, {}, { prediction_id: string }>
     }
 }
 
+interface PendingPredictionInfo {
+    prediction_id: string;
+    createdAt: string | null;
+}
 const getPendingPredictions: RequestHandler<{}, {}, {}, {}> = async (
     req,
     res
 ): Promise<void> => {
-    const pendingPredictionKeys: string[] = [];
+    const pendingPredictions: PendingPredictionInfo[] = [];
     let cursor = '0';
+
     try {
         do {
             const scanResult = await redis.scan(cursor, 'MATCH', 'prediction:*', 'COUNT', 100);
@@ -127,31 +133,40 @@ const getPendingPredictions: RequestHandler<{}, {}, {}, {}> = async (
             if (keys.length > 0) {
                 const pipeline = redis.pipeline();
                 keys.forEach(key => {
-                    pipeline.hget(key, 'status');
+                    pipeline.hmget(key, 'status', 'created_at');
                 });
                 const results = await pipeline.exec();
 
                 results!.forEach((result, index) => {
                     const error = result[0];
-                    const status = result[1]; 
+                    const values = result[1] as (string | null)[];
 
-                    if (!error && status === 'pendiente') {
-                        pendingPredictionKeys.push(keys[index]);
+                    if (!error && values && values[0] === 'pending') {
+                        const fullKey = keys[index];
+                        const onlyKey = fullKey.split(":")[1];
+                        const createdAtValue = values[1]; 
+
+                        pendingPredictions.push({
+                            prediction_id: onlyKey,
+                            createdAt: createdAtValue
+                        });
                     }
                 });
             }
 
         } while (cursor !== '0');
-
-        res.status(200).json(pendingPredictionKeys);
+        res.status(200).json(pendingPredictions);
 
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            msg: "Error interno del servidor al obtener claves de predicciones pendientes."
+            msg: "Error interno del servidor al obtener predicciones pendientes."
         });
     }
 };
+
+
+
 
 
 const SavePrediction: RequestHandler<{}, {}, PredictionResult, {prediction_result?: "completed" | "failed"}> = async (
@@ -177,7 +192,7 @@ const SavePrediction: RequestHandler<{}, {}, PredictionResult, {prediction_resul
 }
 
 predictRoutes.get("/prediction-status", getPredictionStatus)
-
+predictRoutes.get("/get-pending-predictions", getPendingPredictions)
 predictRoutes.post("/start-prediction", StartPredictionRouter);
 predictRoutes.post("/save-prediction",)
 
