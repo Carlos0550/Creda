@@ -94,11 +94,11 @@ const getPredictionStatus: RequestHandler<{}, {}, {}, { prediction_id: string }>
         const predictionData = await redis.hgetall(`prediction:${prediction_id}`)
         const predictionStatus: string = predictionData.status
 
-        const customMessage = {
+        const customMessage: { [key: string]: string } = {
             "pending": "En cola",
             "completed": "Completada",
             "failed": "Fallida"
-        }
+        };
         res.status(200).json({
             msg: "El estado de la predicción es: " + customMessage[predictionStatus] + ".",
             status: predictionStatus
@@ -117,7 +117,6 @@ const getPendingPredictions: RequestHandler<{}, {}, {}, {}> = async (
 ): Promise<void> => {
     const pendingPredictionKeys: string[] = [];
     let cursor = '0';
-
     try {
         do {
             const scanResult = await redis.scan(cursor, 'MATCH', 'prediction:*', 'COUNT', 100);
@@ -128,17 +127,15 @@ const getPendingPredictions: RequestHandler<{}, {}, {}, {}> = async (
             if (keys.length > 0) {
                 const pipeline = redis.pipeline();
                 keys.forEach(key => {
-                    // Usamos HGET para obtener solo el campo 'status'
                     pipeline.hget(key, 'status');
                 });
                 const results = await pipeline.exec();
 
-                results.forEach((result, index) => {
+                results!.forEach((result, index) => {
                     const error = result[0];
-                    const status = result[1]; // status será el valor del campo 'status' o null/undefined
+                    const status = result[1]; 
 
                     if (!error && status === 'pendiente') {
-                        // Si el estado es 'pendiente', añadimos la clave a la lista
                         pendingPredictionKeys.push(keys[index]);
                     }
                 });
