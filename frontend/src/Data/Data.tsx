@@ -97,7 +97,7 @@ function Data() {
     e.preventDefault();
 
     if (!csvFile) {
-      setUploadError("Por favor seleccione un archivo CSV");
+      setUploadError("Please select a CSV file");
       return;
     }
 
@@ -127,14 +127,13 @@ function Data() {
 
       if (!backendResponse.ok) {
         throw new Error(
-          `Error guardando archivo: ${
+          `Error saving file: ${
             backendResponse.status
           } - ${await backendResponse.text()}`
         );
       }
 
       const saveResult = await backendResponse.json();
-      console.log("Archivo guardado en backend:", saveResult);
 
       // PASO 2: Enviar para predicción (mismo archivo)
       const predictFormData = new FormData();
@@ -157,7 +156,7 @@ function Data() {
       setShowResults(true);
     } catch (err: any) {
       console.error("Error en el proceso:", err);
-      setUploadError(err.message || "Error al procesar el archivo CSV");
+      setUploadError(err.message || "Error processing CSV file");
     } finally {
       setIsUploading(false);
     }

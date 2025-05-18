@@ -17,6 +17,7 @@ interface PredictionAlertProps {
   prediction: PredictionResponse | null;
   isLoading: boolean;
   error: string | null;
+  predictionStatus: "pending" | "completed" | "failed" | null; // Añadir este campo
 }
 
 const PredictionAlert: React.FC<PredictionAlertProps> = ({
@@ -25,6 +26,7 @@ const PredictionAlert: React.FC<PredictionAlertProps> = ({
   prediction,
   isLoading,
   error,
+  predictionStatus, // Añadir aquí
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -204,6 +206,8 @@ const PredictionAlert: React.FC<PredictionAlertProps> = ({
             className={`credit-alert-header ${
               error
                 ? "bg-red-500"
+                : predictionStatus === "pending"
+                ? "bg-yellow-500"
                 : isGoodCredit
                 ? "bg-green-500"
                 : "bg-red-500"
@@ -211,7 +215,11 @@ const PredictionAlert: React.FC<PredictionAlertProps> = ({
           >
             <div className="flex items-center">
               <span className="font-semibold text-base">
-                {error ? "Error" : "Credit Prediction Results"}
+                {error
+                  ? "Error"
+                  : predictionStatus === "pending"
+                  ? "Prediction in progress"
+                  : "Credit Prediction Results"}
               </span>
             </div>
             <button
@@ -235,7 +243,14 @@ const PredictionAlert: React.FC<PredictionAlertProps> = ({
           </div>
 
           <div className="credit-alert-body">
-            {isLoading ? (
+            {predictionStatus === "pending" ? (
+              <div className="flex items-center py-8 justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mr-4"></div>
+                <span className="text-gray-600 text-lg">
+                  The prediction is being processed, please wait...
+                </span>
+              </div>
+            ) : isLoading ? (
               <div className="flex items-center py-8 justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mr-4"></div>
                 <span className="text-gray-600 text-lg">
@@ -384,6 +399,8 @@ const Home: React.FC = () => {
     submitSuccess,
     error,
     prediction,
+    predictionId, // Nuevo: necesitamos este valor
+    predictionStatus, // Nuevo: necesitamos este estado
     handleInputChange,
     handleSubmit,
     resetForm,
@@ -394,10 +411,10 @@ const Home: React.FC = () => {
 
   // Show alert when prediction is received
   useEffect(() => {
-    if (submitSuccess && prediction) {
+    if (predictionStatus === "pending" || (submitSuccess && prediction)) {
       setShowAlert(true);
     }
-  }, [submitSuccess, prediction]);
+  }, [submitSuccess, prediction, predictionStatus]);
 
   return (
     <div className="container mx-auto p-4 mt-12 relative">
@@ -415,6 +432,7 @@ const Home: React.FC = () => {
         prediction={prediction}
         isLoading={isSubmitting}
         error={error}
+        predictionStatus={predictionStatus} // Añadir este prop
       />
 
       {error && !showAlert && (

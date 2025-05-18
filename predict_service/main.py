@@ -48,5 +48,13 @@ app.include_router(predict.router)
 
 if __name__ == "__main__":
     import uvicorn
-
+    import threading
+    import worker  # importa tu worker.py
+    
+    # Iniciar el worker en un thread separado
+    worker_thread = threading.Thread(target=worker.main)
+    worker_thread.daemon = True  # El thread se cerrará cuando el programa principal termine
+    worker_thread.start()
+    
+    # Iniciar el servidor FastAPI
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

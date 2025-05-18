@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { url_predictform } from "../../Context/APIs";
+import React, { useState, useEffect } from "react";
+import { prediction_endpoints } from "../../Context/APIs";
 
 // Definición del tipo de datos para el formulario
 interface ClientFormData {
@@ -118,11 +118,13 @@ const initialFormData: ClientFormData = {
 
 export interface FormState {
   formData: ClientFormData;
-  errors: { [key: string]: string }; 
+  errors: { [key: string]: string };
   isSubmitting: boolean;
   submitSuccess: boolean | null;
   error: string | null;
   prediction: any | null;
+  predictionId: string | null; // Nuevo: ID de la predicción en curso
+  predictionStatus: "pending" | "completed" | "failed" | null; // Nuevo: estado de la predicción
 }
 
 export const useClientForm = () => {
@@ -133,7 +135,101 @@ export const useClientForm = () => {
     submitSuccess: null,
     error: null,
     prediction: null,
+    predictionId: null, // Inicialmente no hay predicción
+    predictionStatus: null, // Inicialmente no hay estado de predicción
   });
+
+  // Función para verificar el estado de la predicción
+  const checkPredictionStatus = async (predictionId: string) => {
+    try {
+      const response = await fetch(
+        prediction_endpoints.getPredictionStatus(predictionId).toString()
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error en la consulta: ${response.status}`);
+      }
+
+      const apiResponse = await response.json();
+
+      // Return the API response directly so we can process it in the useEffect
+      return apiResponse;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // UseEffect para verificar periódicamente el estado de la predicción
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (state.predictionId && state.predictionStatus === "pending") {
+      // Iniciar verificación periódica
+      intervalId = setInterval(async () => {
+        try {
+          const statusData = await checkPredictionStatus(state.predictionId!);
+
+          // Actualizar estado según la respuesta
+          if (statusData.status === "completed") {
+            // La predicción ha terminado con éxito
+            clearInterval(intervalId);
+
+            // Transform the API response to match the expected format
+            const predictionResult = {
+              status: "success",
+              predictions: [
+                {
+                  // Use client ID from the form
+                  client_id: state.formData.ID_CLIENT,
+                  // Parse the score as a number
+                  client_credit_scoring: parseFloat(
+                    statusData.prediction_data.client_score
+                  ),
+                  client_credit_status:
+                    statusData.prediction_data.client_credit_status,
+                },
+              ],
+              count: 1,
+            };
+
+            setState((prev) => ({
+              ...prev,
+              predictionStatus: "completed",
+              isSubmitting: false,
+              submitSuccess: true,
+              prediction: predictionResult,
+            }));
+          } else if (statusData.status === "failed") {
+            // La predicción ha fallado
+            clearInterval(intervalId);
+            setState((prev) => ({
+              ...prev,
+              predictionStatus: "failed",
+              isSubmitting: false,
+              submitSuccess: false,
+              error: "La predicción ha fallado",
+            }));
+          }
+          // Si sigue en "pending", continuamos esperando
+        } catch (error) {
+          clearInterval(intervalId);
+          console.error("Error en la verificación periódica:", error);
+          setState((prev) => ({
+            ...prev,
+            isSubmitting: false,
+            error:
+              error instanceof Error ? error.message : "Error de verificación",
+            predictionStatus: "failed",
+          }));
+        }
+      }, 3000); // Verificar cada 3 segundos
+    }
+
+    // Limpiar intervalo al desmontar
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [state.predictionId, state.predictionStatus]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -166,6 +262,7 @@ export const useClientForm = () => {
     }));
   };
 
+  // Modificar handleSubmit para usar el flujo asíncrono
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -185,16 +282,33 @@ export const useClientForm = () => {
       return; // Detener envío
     }
 
-    setState((prev) => ({ ...prev, isSubmitting: true, error: null }));
+    setState((prev) => ({
+      ...prev,
+      isSubmitting: true,
+      error: null,
+      predictionStatus: "pending", // Iniciar como pendiente
+    }));
 
     try {
-      const response = await fetch(url_predictform.toString(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(state.formData),
-      });
+      // Modificar para incluir TOTAL_MONTHLY_INCOME
+      const formDataWithTotal = {
+        ...state.formData,
+        TOTAL_MONTHLY_INCOME:
+          (state.formData.PERSONAL_MONTHLY_INCOME || 0) +
+          (state.formData.OTHER_INCOMES || 0),
+      };
+
+      // Usar el nuevo endpoint de inicio de predicción
+      const response = await fetch(
+        prediction_endpoints.startPrediction.toString(),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formDataWithTotal),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -202,19 +316,24 @@ export const useClientForm = () => {
 
       const result = await response.json();
 
+      if (!result.prediction_id) {
+        throw new Error("No se recibió un ID de predicción válido");
+      }
+
+      // Guardar el ID de predicción
       setState((prev) => ({
         ...prev,
-        isSubmitting: false,
-        submitSuccess: true,
-        prediction: result,
+        predictionId: result.prediction_id,
+        // No cambiamos isSubmitting a false todavía
       }));
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error:", error);
       setState((prev) => ({
         ...prev,
         isSubmitting: false,
         submitSuccess: false,
         error: error instanceof Error ? error.message : "Error desconocido",
+        predictionStatus: null,
       }));
     }
   };

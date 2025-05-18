@@ -22,7 +22,7 @@ BACKEND_URL_DELETE = (
 async def predict_endpoint(
     file: UploadFile = File(...),
     save_to_db: bool = True,  # Parámetro opcional para guardar en BD
-    delete_existing: bool = False,  # Parámetro para eliminar todos los clientes primero
+    delete_existing: bool = True,  # Parámetro para eliminar todos los clientes primero
 ):
     if delete_existing:
         try:
