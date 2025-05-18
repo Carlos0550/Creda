@@ -85,6 +85,7 @@ export const SaveCSVRouter: RequestHandler<{}, {}, {}, {}> = async (
     }
 
     await redis.hset(redisKey, fileData)
+    await redis.expire(redisKey, 600)
     res.status(200).json({
       msg: `Archivo guardado con éxito. "${file.originalname}"`
     })
@@ -109,7 +110,7 @@ export const GetFilesStatus: RequestHandler<{}, {}, {}, {}> = async (
 
     if (!keys || keys.length === 0) {
       res.status(404).json({
-        msg: "No se encontraron archivos."
+        msg: "No se encontraron archivos o la clave es inválida."
       });
       return;
     }
