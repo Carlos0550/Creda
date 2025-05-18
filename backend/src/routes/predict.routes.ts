@@ -161,6 +161,12 @@ const getPendingPredictions: RequestHandler<{}, {}, {}, {}> = async (
             }
 
         } while (cursor !== '0'); 
+        if(Object.keys(pendingPredictions).length === 0) {
+            res.status(404).json({
+                msg: "No se encontraron predicciones pendientes."
+            });
+            return
+        }
         res.status(200).json(pendingPredictions);
 
     } catch (error) {
@@ -199,7 +205,6 @@ const SavePrediction: RequestHandler<{}, {}, PredictionResult, {prediction_resul
         prediction_result
     } = body
     try {
-        console.log(body)
         const redisKey = `prediction:${prediction_id}`;
         const predictionData = await redis.hgetall(redisKey)
         const created_at = predictionData.created_at
