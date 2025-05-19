@@ -109,7 +109,7 @@ function Data() {
       );
 
       if (!response.ok) {
-        throw new Error(`Error getting customers, please upload a csv file and refresh the table.: ${response.status}`);
+        throw new Error(`Error getting customers, please upload a csv file and refresh the table.`);
       }
 
       const data = await response.json();
