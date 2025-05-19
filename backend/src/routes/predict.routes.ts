@@ -64,7 +64,7 @@ const StartPredictionRouter: RequestHandler<{}, {}, SelectedFeatures, {}> = asyn
         };
         await redis.hset(redisKey, predictionData);
 
-        await redis.expire(redisKey, 600); //Limite de 10 minutos
+        await redis.expire(redisKey, 120); 
         res.status(200).json({
             msg: "Prediccion puesta en cola con exito.",
             prediction_id: key

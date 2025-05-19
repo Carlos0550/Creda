@@ -10,3 +10,4 @@ backend/.env
 frontend/.env
 backend/CredaDatabase.sql
 backend/dist/*
+predict_service/venv

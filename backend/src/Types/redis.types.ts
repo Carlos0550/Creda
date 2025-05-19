@@ -4,6 +4,7 @@ export interface RedisFileMetadata {
     file_type: string; 
     file_size: string; 
     created_at: string;
+    status: "pending" | "completed"
 }
 
 export interface FileMetadataWithKey extends RedisFileMetadata {

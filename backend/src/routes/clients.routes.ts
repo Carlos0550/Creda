@@ -81,11 +81,12 @@ export const SaveCSVRouter: RequestHandler<{}, {}, {}, {}> = async (
       file_path: `/uploads/${file.filename}`,
       file_type: file.mimetype,
       file_size: file.size,
-      created_at: dayjs().format('YYYY-MM-DD HH:mm:ss')
+      created_at: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      status: "pending"
     }
 
     await redis.hset(redisKey, fileData)
-    await redis.expire(redisKey, 600)
+    await redis.expire(redisKey, 120)
     res.status(200).json({
       msg: `Archivo guardado con éxito. "${file.originalname}"`
     })
@@ -101,7 +102,7 @@ export const SaveCSVRouter: RequestHandler<{}, {}, {}, {}> = async (
   }
 }
 
-export const GetFilesStatus: RequestHandler<{}, {}, {}, {}> = async (
+export const GetFilesStatus: RequestHandler = async (
   _,
   res,
 ): Promise<void> => {
@@ -182,7 +183,7 @@ const DownloadFile: RequestHandler<{}, {}, {}, { file_id: string }> = async (
   const redisKey = file_id;
   try {
     const fileMetadata = await redis.hgetall(redisKey) as unknown as RedisFileMetadata | null;
-    console.log(fileMetadata)
+    console.log("Metadatos del archivo:", fileMetadata)
     if (!fileMetadata || Object.keys(fileMetadata).length === 0) {
       res.status(404).json({
         msg: "Metadatos del archivo no encontrados en Redis."
@@ -200,7 +201,21 @@ const DownloadFile: RequestHandler<{}, {}, {}, { file_id: string }> = async (
     }
 
     const downloadFileName = fileMetadata.file_name;
+    const redisPipeline = redis.pipeline();
 
+    redis.pipeline().del(redisKey);
+    const newRedisValue = {
+      file_name: fileMetadata.file_name,
+      file_path: fileMetadata.file_path,
+      file_type: fileMetadata.file_type,
+      file_size: fileMetadata.file_size,
+      created_at: fileMetadata.created_at,
+      status: "completed"
+    }
+
+    redisPipeline.hset(redisKey, newRedisValue);
+    redisPipeline.expire(redisKey, 120);
+    await redisPipeline.exec();
     if (!downloadFileName) {
       console.error(`Metadatos para la clave ${redisKey} no contienen un nombre de archivo.`);
       res.status(500).json({

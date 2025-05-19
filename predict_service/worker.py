@@ -30,10 +30,14 @@ CSV_DELETE_ALL_CLIENTS_URL = f"{URL_BASE}/clients/test/delete-all-clients"
 
 def get_pending_predictions():
     """Fetch pending predictions from the API"""
+    os.system("clear")
+    time.sleep(1)
     try:
         response = requests.get(PREDICTION_PENDING_URL)
+        
         if response.status_code == 200:
             return response.json()
+            
         elif response.status_code == 404:
             logger.info("No pending predictions found")
             return {}
@@ -223,13 +227,15 @@ def get_pending_csv_files():
         files_data = response.json()
         files = files_data.get("files", [])
 
-        # Filtra los archivos que aún no han sido procesados (puedes ajustar la lógica)
-        # Aquí asumiremos que todos los archivos están pendientes ya que no hay un campo "processed"
+        # Filtrar solo archivos CSV con estado 'pending'
         pending_files = [
-            f for f in files if f.get("file_name", "").lower().endswith(".csv")
+            f for f in files
+            if f.get("file_name", "").lower().endswith(".csv") and f.get("status") == "pending"
         ]
 
-        if pending_files:
+        if not pending_files:
+            logger.info("No se encontraron archivos CSV pendientes")
+        else:
             logger.info(f"Encontrados {len(pending_files)} archivos CSV pendientes")
 
         return pending_files
@@ -359,9 +365,10 @@ def main():
         try:
             # Get pending predictions (código existente)
             pending_predictions = get_pending_predictions()
-
+            print("Predicciones pendientes", pending_predictions)
             if pending_predictions:
                 count = len(pending_predictions)
+                print("Longitud: " , count)
                 logger.info(f"Found {count} pending predictions")
 
                 for pred_id, prediction_data in pending_predictions.items():
@@ -370,7 +377,7 @@ def main():
 
                     # Process prediction
                     result = process_prediction(prediction_data)
-
+                    print("Result: ", result)
                     # Save result
                     save_prediction_result(result)
             else:
