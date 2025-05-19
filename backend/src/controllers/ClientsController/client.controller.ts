@@ -121,7 +121,7 @@ export const GetAllClientsController:RequestHandler<{},{},{},{}> = async(
 
     try {
         client = await pool.connect();
-        const result = await client.query("SELECT * FROM clients TABLESAMPLE SYSTEM (0.1) LIMIT 30;")
+        const result = await client.query("SELECT * FROM clients LIMIT 30;")
         console.log(result.rows)
         if(result.rowCount! > 0){
             res.status(200).json({
