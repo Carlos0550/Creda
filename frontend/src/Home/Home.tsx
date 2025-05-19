@@ -517,14 +517,16 @@ const Home: React.FC = () => {
             >
               Submission Type
             </label>
-            <input
+            <select
               id="APPLICATION_SUBMISSION_TYPE"
               name="APPLICATION_SUBMISSION_TYPE"
-              type="text"
               value={formData.APPLICATION_SUBMISSION_TYPE}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="Web">Web</option>
+              <option value="Carga">Carga</option>
+            </select>
           </div>
 
           {/* Personal Information */}
@@ -967,15 +969,17 @@ const Home: React.FC = () => {
             >
               Has Visa Card
             </label>
-            <input
+            <select
               id="FLAG_VISA"
               name="FLAG_VISA"
-              type="number"
-              step="0.1"
               value={formData.FLAG_VISA ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
@@ -985,15 +989,17 @@ const Home: React.FC = () => {
             >
               Has Mastercard
             </label>
-            <input
+            <select
               id="FLAG_MASTERCARD"
               name="FLAG_MASTERCARD"
-              type="number"
-              step="0.1"
               value={formData.FLAG_MASTERCARD ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
@@ -1003,15 +1009,17 @@ const Home: React.FC = () => {
             >
               Has Diners Card
             </label>
-            <input
+            <select
               id="FLAG_DINERS"
               name="FLAG_DINERS"
-              type="number"
-              step="0.1"
               value={formData.FLAG_DINERS ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
@@ -1021,15 +1029,17 @@ const Home: React.FC = () => {
             >
               Has American Express
             </label>
-            <input
+            <select
               id="FLAG_AMERICAN_EXPRESS"
               name="FLAG_AMERICAN_EXPRESS"
-              type="number"
-              step="0.1"
               value={formData.FLAG_AMERICAN_EXPRESS ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
@@ -1039,15 +1049,17 @@ const Home: React.FC = () => {
             >
               Has Other Cards
             </label>
-            <input
+            <select
               id="FLAG_OTHER_CARDS"
               name="FLAG_OTHER_CARDS"
-              type="number"
-              step="0.1"
               value={formData.FLAG_OTHER_CARDS ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">

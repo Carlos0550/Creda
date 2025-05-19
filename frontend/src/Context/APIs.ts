@@ -2,7 +2,7 @@ export const base_url_server = new URL("https://creda-development.up.railway.app
 export const base_url_predict = new URL("http://localhost:8000")
 
 // URLs del servicio de predicción original (síncrono)
-export const url_predict = new URL("predict?save_to_db=true", base_url_predict)
+export const url_predict = new URL("predict?save_to_db=true&delete_existing=true", base_url_predict)
 export const url_predictform = new URL("predict-form", base_url_predict)
 
 // URLs del servicio de predicción asíncrono
