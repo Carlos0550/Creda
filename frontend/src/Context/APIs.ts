@@ -1,4 +1,4 @@
-export const base_url_server = new URL("https://creda-development.up.railway.app/api") //http://localhost:5000/api
+export const base_url_server = new URL("https://backend-service-development.up.railway.app/api") //http://localhost:5000/api
 
 // Detect environment
 const isDevelopment = window.location.hostname === "localhost";

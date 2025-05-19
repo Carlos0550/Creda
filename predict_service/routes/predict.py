@@ -11,9 +11,9 @@ from typing import Optional
 router = APIRouter()
 
 # URL del servicio de backend (ajusta según tu configuración de Docker)
-BACKEND_URL = "https://creda-development.up.railway.app/api/clients/create-client"
+BACKEND_URL = "https://backend-service-development.up.railway.app/api/clients/create-client"
 BACKEND_URL_DELETE = (
-    "https://creda-development.up.railway.app/api/clients/test/delete-all-clients"
+    "https://backend-service-development.up.railway.app/api/clients/test/delete-all-clients"
 )
 # Para pruebas locales usa: "http://localhost:5000/api/clients/create-client"
 
