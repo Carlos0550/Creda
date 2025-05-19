@@ -129,12 +129,12 @@ export const GetAllClientsController:RequestHandler<{},{},{},{}> = async(
                 clients: result.rows
             })
             return
-        }
-
-        res.status(400).json({
-            msg: "Un error ocurrio al obtener los clientes."
-        })
-        return
+        }else{
+            res.status(404).json({
+                msg: "La lista de clientes está vacía."
+            })
+            return
+        }        
     } catch (error) {
         console.log(error)
         res.status(400).json({
