@@ -249,16 +249,16 @@ router.get("/download-file", DownloadFile)
 //   }
 // });
 
-// router.delete("/test/delete-all-clients", async (req, res) => {
-//   console.warn("INICIANDO TEST: Eliminar todos los clientes.");
-//   const result = await deleteAllClients();
-//   console.warn("TERMINADO TEST: Eliminar todos los clientes.");
+router.delete("/test/delete-all-clients", async (req, res) => {
+  console.warn("INICIANDO TEST: Eliminar todos los clientes.");
+  const result = await deleteAllClients();
+  console.warn("TERMINADO TEST: Eliminar todos los clientes.");
 
-//   if (result) {
-//     res.status(200).json({ msg: "Todos los clientes fueron eliminados con éxito." });
-//   } else {
-//     res.status(500).json({ msg: "Error al eliminar los clientes." });
-//   }
-// });
+  if (result) {
+    res.status(200).json({ msg: "Todos los clientes fueron eliminados con éxito." });
+  } else {
+    res.status(500).json({ msg: "Error al eliminar los clientes." });
+  }
+});
 
 export default router
