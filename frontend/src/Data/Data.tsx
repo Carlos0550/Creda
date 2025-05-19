@@ -109,7 +109,7 @@ function Data() {
       );
 
       if (!response.ok) {
-        throw new Error(`Error al obtener clientes: ${response.status}`);
+        throw new Error(`Error getting customers, please upload a csv file and refresh the table.: ${response.status}`);
       }
 
       const data = await response.json();
@@ -411,7 +411,7 @@ function Data() {
               </p>
               <button
                 onClick={loadClientsFromDatabase}
-                className="ml-4 bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded-md min-w-[120px] transition-all duration-300 flex items-center justify-center shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                className="ml-4 bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded-md min-w-[120px] transition-all duration-300 flex items-center justify-center shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
