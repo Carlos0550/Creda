@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { loadDataset } from "./utils/DatasetLoading";
 import { ScoreModal, checkClientScore } from "./utils/CheckScore";
 import {
@@ -9,7 +9,11 @@ import {
   GridLogicOperator,
 } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
-import { url_predict, globalApis } from "../Context/APIs";
+import {
+  url_predict,
+  globalApis,
+  csvProcessingEndpoints,
+} from "../Context/APIs";
 
 // Custom toolbar with prominent search
 function CustomToolbar() {
@@ -69,6 +73,8 @@ function Data() {
   const [predictionResults, setPredictionResults] = useState<any>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [clients, setClients] = useState<any[]>([]);
+  const [isLoadingClients, setIsLoadingClients] = useState<boolean>(false);
 
   const handleCheckScore = async () => {
     if (!clientId.trim()) {
@@ -93,6 +99,40 @@ function Data() {
     }
   };
 
+  const loadClientsFromDatabase = async () => {
+    setIsLoadingClients(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        csvProcessingEndpoints.getAllClients.toString()
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener clientes: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.clients && data.clients.length > 0) {
+        setClients(data.clients);
+        setTotalRows(data.rowsCount || data.clients.length);
+      } else {
+        setClients([]);
+        setTotalRows(0);
+      }
+    } catch (err: any) {
+      console.error("Error cargando clientes:", err);
+      setError(err.message || "Error al cargar clientes");
+    } finally {
+      setIsLoadingClients(false);
+    }
+  };
+
+  useEffect(() => {
+    loadClientsFromDatabase();
+  }, []);
+
   const handleCsvUpload = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -107,7 +147,7 @@ function Data() {
     setShowResults(false);
 
     try {
-      // Cargar el CSV en la tabla
+      // Cargar el CSV en la tabla para vista previa
       const parsedData = await loadDataset({ file: csvFile });
       if (Array.isArray(parsedData)) {
         setData(parsedData);
@@ -135,25 +175,15 @@ function Data() {
 
       const saveResult = await backendResponse.json();
 
-      // PASO 2: Enviar para predicción (mismo archivo)
-      const predictFormData = new FormData();
-      predictFormData.append("file", csvFile);
-
-      const response = await fetch(url_predict, {
-        method: "POST",
-        body: predictFormData,
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Error en predicción: ${response.status} - ${await response.text()}`
-        );
-      }
-
-      const results = await response.json();
-      console.log("Prediction results:", results);
-      setPredictionResults(results);
+      // PASO 2: Esperar un tiempo para que el worker procese los datos
+      setPredictionResults({ processing: true });
       setShowResults(true);
+
+      // Esperar 10 segundos y luego cargar los clientes
+      setTimeout(() => {
+        loadClientsFromDatabase();
+        setPredictionResults({ completed: true });
+      }, 10000);
     } catch (err: any) {
       console.error("Error en el proceso:", err);
       setUploadError(err.message || "Error processing CSV file");
@@ -162,18 +192,45 @@ function Data() {
     }
   };
 
-  const columns: GridColDef[] =
-    data.length > 0
-      ? Object.keys(data[0])
-          .filter((key) => key !== "id")
-          .map((key) => ({
-            field: key,
-            headerName:
-              key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " "),
-            flex: 1,
-            minWidth: 120,
-          }))
-      : [];
+  // Actualización de las columnas para usar los nombres exactos del JSON
+  const clientColumns: GridColDef[] = [
+    {
+      field: "client_id",
+      headerName: "Client ID",
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: "client_credit_scoring",
+      headerName: "Credit risk",
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) => {
+        const score = parseFloat(params.value) * 100;
+        return `${score.toFixed(2)}%`;
+      },
+    },
+    {
+      field: "client_credit_status",
+      headerName: "Status",
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) => {
+        const status = params.value;
+        return (
+          <span
+            className={`py-1 px-3 rounded-full text-sm font-medium ${
+              status === "good"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {status.toUpperCase()}
+          </span>
+        );
+      },
+    },
+  ];
 
   return (
     <div className="container mx-auto px-4 py-8 mt-8">
@@ -307,78 +364,78 @@ function Data() {
         </div>
       </div>
 
+      {/* Resultados de procesamiento */}
       {showResults && predictionResults && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+        <div className="mb-6 p-4">
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-bold text-lg text-green-800">
-              Prediction results
+              {predictionResults.processing
+                ? "Processing prediction..."
+                : "Prediction completed"}
             </h3>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">
-                    ID Client
-                  </th>
-                  <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">
-                    Credit Scoring
-                  </th>
-                  <th className="py-2 px-4 border-b text-left font-semibold text-gray-700">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {predictionResults.predictions.map((client) => (
-                  <tr key={client.client_id} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b">{client.client_id}</td>
-                    <td className="py-2 px-4 border-b">
-                      {(client.client_credit_scoring * 100).toFixed(2)}%
-                    </td>
-                    <td
-                      className={`py-2 px-4 border-b ${
-                        client.client_credit_status === "good"
-                          ? "text-green-600 font-medium"
-                          : "text-red-600 font-medium"
-                      }`}
-                    >
-                      {client.client_credit_status.toUpperCase()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {predictionResults.processing && (
+            <div className="flex items-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-3 text-green-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <p>
+                The file is being processed. The table will be updated
+                automatically.
+              </p>
+            </div>
+          )}
 
-          <div className="mt-2 text-sm text-gray-600">
-            Total clientes analizados: {predictionResults.count}
-          </div>
+          {predictionResults.completed && (
+            <div className="text-green-700 flex items-center justify-between">
+              <p>
+                Processing has completed. The table is updated with the results.
+              </p>
+              <button
+                onClick={loadClientsFromDatabase}
+                className="ml-4 bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded-md min-w-[120px] transition-all duration-300 flex items-center justify-center shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Refresh
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {uploadError && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
-          <p className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {uploadError}
-          </p>
-        </div>
-      )}
-
-      {loading ? (
+      {/* Tabla de clientes */}
+      {isLoadingClients ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
         </div>
@@ -400,7 +457,7 @@ function Data() {
             {error}
           </p>
         </div>
-      ) : data.length === 0 ? (
+      ) : clients.length === 0 ? (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-md p-4">
           <p className="flex items-center">
             <svg
@@ -415,30 +472,25 @@ function Data() {
                 clipRule="evenodd"
               />
             </svg>
-            No records were found to display.
+            No se encontraron clientes. Suba un archivo CSV para procesar.
           </p>
         </div>
       ) : (
-        <div
-          style={{ height: 600 }}
-          className="bg-white rounded-lg shadow-md overflow-hidden"
-        >
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <DataGrid
-            rows={data}
-            columns={columns}
+            rows={clients.map((client, index) => ({
+              id: index,
+              ...client,
+            }))}
+            columns={clientColumns}
             initialState={{
               pagination: {
                 paginationModel: { pageSize: 10, page: 0 },
               },
-              filter: {
-                filterModel: {
-                  items: [],
-                  quickFilterLogicOperator: GridLogicOperator.Or,
-                },
-              },
             }}
             pageSizeOptions={[5, 10, 25, 50, 100]}
             disableRowSelectionOnClick
+            autoHeight
             slots={{
               toolbar: CustomToolbar,
             }}
@@ -459,14 +511,12 @@ function Data() {
               "& .MuiDataGrid-row:hover": {
                 backgroundColor: "rgba(0, 0, 0, 0.04)",
               },
-              ".MuiDataGrid-virtualScroller": {
-                minHeight: "400px",
-              },
             }}
           />
         </div>
       )}
 
+      {/* Modal para verificar score */}
       <ScoreModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
