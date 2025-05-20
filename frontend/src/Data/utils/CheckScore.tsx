@@ -35,7 +35,6 @@ export const checkClientScore = async (
   }
 };
 
-
 export const ScoreModal: React.FC<ScoreAlertProps> = ({
   isOpen,
   onClose,
@@ -263,8 +262,10 @@ export const ScoreModal: React.FC<ScoreAlertProps> = ({
                   <div className="credit-score-header">
                     <div className="credit-info-label">Credit risk</div>
                     <div className="font-bold text-2xl">
-                      {data.client_score}
-                      <span className="text-gray-400 text-sm ml-1.5">/ 1</span>
+                      {(parseFloat(data.client_score) * 100).toFixed(2)}%
+                      <span className="text-gray-400 text-sm ml-1.5">
+                        / 100%
+                      </span>
                     </div>
                   </div>
                   <div className="credit-score-bar">

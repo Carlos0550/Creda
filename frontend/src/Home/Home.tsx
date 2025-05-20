@@ -324,8 +324,10 @@ const PredictionAlert: React.FC<PredictionAlertProps> = ({
                   <div className="credit-score-header">
                     <div className="credit-info-label">Credit Risk</div>
                     <div className="font-bold text-2xl">
-                      {score.toFixed(5)}
-                      <span className="text-gray-400 text-sm ml-1.5">/ 1</span>
+                      {(score * 100).toFixed(2)}%
+                      <span className="text-gray-400 text-sm ml-1.5">
+                        / 100%
+                      </span>
                     </div>
                   </div>
                   <div className="credit-score-bar">
