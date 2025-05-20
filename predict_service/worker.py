@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("worker")
 
-URL_BASE = "https://creda-development.up.railway.app/api"
+URL_BASE = "https://creda-backend.up.railway.app/api"
 PREDICTION_PENDING_URL = f"{URL_BASE}/predictions/get-pending-predictions"
 PREDICTION_STATUS_URL = f"{URL_BASE}/predictions/prediction-status"
 PREDICTION_SAVE_URL = f"{URL_BASE}/predictions/save-prediction"
