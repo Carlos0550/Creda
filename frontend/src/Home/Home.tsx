@@ -596,15 +596,21 @@ const Home: React.FC = () => {
             >
               Marital Status
             </label>
-            <input
+            <select
               id="MARITAL_STATUS"
               name="MARITAL_STATUS"
-              type="number"
-              step="0.1"
               value={formData.MARITAL_STATUS ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select marital status</option>
+              <option value="1">Single</option>
+              <option value="2">Married</option>
+              <option value="3">Divorced</option>
+              <option value="4">Widowed</option>
+              <option value="5">Separated</option>
+              <option value="6">Domestic Partnership</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
@@ -682,15 +688,25 @@ const Home: React.FC = () => {
             >
               Nationality
             </label>
-            <input
+            <select
               id="NACIONALITY"
               name="NACIONALITY"
-              type="number"
-              step="0.1"
               value={formData.NACIONALITY ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select nationality</option>
+              <option value="1">Brazilian</option>
+              <option value="2">Argentinian</option>
+              <option value="3">American</option>
+              <option value="4">Spanish</option>
+              <option value="5">Portuguese</option>
+              <option value="6">Italian</option>
+              <option value="7">German</option>
+              <option value="8">French</option>
+              <option value="9">Mexican</option>
+              <option value="10">Other</option>
+            </select>
           </div>
 
           {/* Residential Information */}
@@ -786,15 +802,22 @@ const Home: React.FC = () => {
             >
               Residence Type
             </label>
-            <input
+            <select
               id="RESIDENCE_TYPE"
               name="RESIDENCE_TYPE"
-              type="number"
-              step="0.1"
               value={formData.RESIDENCE_TYPE ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select residence type</option>
+              <option value="1">Owned Home</option>
+              <option value="2">Rented Apartment</option>
+              <option value="3">Living with Family</option>
+              <option value="4">Mortgaged Property</option>
+              <option value="5">Company Provided</option>
+              <option value="6">Public Housing</option>
+              <option value="7">Temporary Accommodation</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
@@ -879,15 +902,17 @@ const Home: React.FC = () => {
             >
               Has Email
             </label>
-            <input
+            <select
               id="FLAG_EMAIL"
               name="FLAG_EMAIL"
-              type="number"
-              step="0.1"
               value={formData.FLAG_EMAIL ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           {/* Financial Information */}
@@ -1377,15 +1402,17 @@ const Home: React.FC = () => {
             >
               Has RG Document
             </label>
-            <input
+            <select
               id="FLAG_RG"
               name="FLAG_RG"
-              type="number"
-              step="0.1"
               value={formData.FLAG_RG ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
@@ -1395,15 +1422,17 @@ const Home: React.FC = () => {
             >
               Has CPF Document
             </label>
-            <input
+            <select
               id="FLAG_CPF"
               name="FLAG_CPF"
-              type="number"
-              step="0.01"
               value={formData.FLAG_CPF ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select</option>
+              <option value="1">Yes</option>
+              <option value="0">No</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
