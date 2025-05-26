@@ -565,8 +565,17 @@ const Home: React.FC = () => {
               step="1"
               min="0"
               value={formData.AGE ?? ""}
-              onChange={handleInputChange}
+              onChange={(e) => {
+                // Si el valor es negativo, establecerlo a 0 o vacío
+                if (Number(e.target.value) < 0) {
+                  e.target.value = "";
+                }
+                handleInputChange(e);
+              }}
               onInput={(e) => {
+                // Eliminar cualquier signo negativo al comienzo
+                e.currentTarget.value = e.currentTarget.value.replace(/^-/, "");
+                // Mantener tu lógica actual para manejar decimales
                 e.currentTarget.value = e.currentTarget.value.replace(
                   /\D[^.]|\.{1,}/g,
                   ""
