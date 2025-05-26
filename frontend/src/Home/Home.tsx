@@ -562,9 +562,20 @@ const Home: React.FC = () => {
               id="AGE"
               name="AGE"
               type="number"
-              step="0.1"
+              step="1"
+              min="0"
               value={formData.AGE ?? ""}
               onChange={handleInputChange}
+              onInput={(e) => {
+                e.currentTarget.value = e.currentTarget.value.replace(
+                  /\D[^.]|\.{1,}/g,
+                  ""
+                );
+                e.currentTarget.value = e.currentTarget.value.replace(
+                  /\..*/,
+                  ""
+                );
+              }}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
             />
           </div>
@@ -1409,17 +1420,24 @@ const Home: React.FC = () => {
               className="block text-gray-700 text-sm font-bold mb-2"
               htmlFor="PRODUCT"
             >
-              Product
+              Product (Credit Type)
             </label>
-            <input
+            <select
               id="PRODUCT"
               name="PRODUCT"
-              type="number"
-              step="0.1"
               value={formData.PRODUCT ?? ""}
               onChange={handleInputChange}
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-10"
-            />
+            >
+              <option value="">Select credit type</option>
+              <option value="1">Personal Loan</option>
+              <option value="2">Mortgage</option>
+              <option value="3">Auto Loan</option>
+              <option value="4">Credit Card</option>
+              <option value="5">Student Loan</option>
+              <option value="6">Home Equity Line of Credit</option>
+              <option value="7">Business Loan</option>
+            </select>
           </div>
 
           <div className="mt-4 mr-4 ml-4 ">
